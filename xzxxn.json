@@ -1,0 +1,121 @@
+{
+  "id": "xzxxn",
+  "name": "雪之下雪乃",
+  "author": "@xzxxn",
+  "icon": "https://raw.githubusercontent.com/xzxxn777/quanx/main/picture/xzxxn.png",
+  "repo": "https://github.com/xzxxn777/quanx",
+  "apps": [
+    {
+      "id": "Tele_Check",
+      "name": "电信流量查询v2.0",
+      "descs_html": [
+        "<b>Body获取方法：</b>",
+        "1. 进入翼支付，打开手机充值",
+        "2. 当提示获取到body后即可，在BoxJS中可以查看到获取到的body",
+        "<b>注意事项：</b>",
+        "1. 初次使用流量免流与跳点可能错误",
+        "2. 对于筛选流量包，如果剩余数据与定向不正确，则说明表达式可能筛选了其他的包，请输入更精准的包名",
+        "3. 如果你之前使用的是自动选包，更换手动选包后跳点与免流信息在初次查询可能有错误，不用在意"
+      ],
+      "keys": ["Tele_BD","limititems","unlimititems","hourstimeStore","minutestimeStore","limitStore","unlimitStore","bark_icon","bark_key","bark_add"],
+      "settings": [
+        {
+          "id": "Tele_BD",
+          "name": "电信请求Body",
+          "val": "",
+          "type": "text",
+          "placeholder": "请求体",
+          "autoGrow": true,
+          "rows": 1,
+          "desc": "输入电信请求体"
+        },
+        {
+          "id": "notice_switch",
+          "name": "是否禁用定时通知",
+          "val": false,
+          "type": "boolean",
+          "desc": "开启后将在流量变化时通知流量信息"
+        },
+        {
+          "id": "auto_switch",
+          "name": "是否开启自动选择包(默认自动选包)",
+          "val": true,
+          "type": "boolean",
+          "desc": "数据包不能正确显示的,只能关闭开关,手动选择特定包监控"
+        },
+        {
+          "id": "threshold",
+          "name": "跳点提醒阈值(定时通知时阈值不起作用)",
+          "val": 0,
+          "autoGrow": true,
+          "rows": 1,
+          "type": "number",
+          "desc": "默认阈值为0，单位为kb，即有变化就通知"
+        },
+        {
+          "id": "limititems",
+          "name": "通用包名正则",
+          "val": "",
+          "placeholder": "输入通用包以空格分开",
+          "autoGrow": true,
+          "rows": 1,
+          "type": "text",
+          "desc": "例如：“合约包 结转包”（最好是明显的标志）则通用剩余显示这两个包的总和（不用打引号）"
+        },
+        {
+          "id": "unlimititems",
+          "name": "定向包名正则",
+          "val": "",
+          "placeholder": "输入定向包以空格分开",
+          "autoGrow": true,
+          "rows": 1,
+          "type": "text",
+          "desc": "例如：“畅享量 某某定向”（最好是明显的标志）则定向总免显示这两个包的总和（不用打引号）"
+        }
+      ],
+      "author": "@xzxxn",
+      "repo": "https://github.com/xzxxn777/quanx",
+      "script": "https://github.com/xzxxn777/quanx/blob/main/TeleV2.0/10000.js",
+      "icons": ["https://raw.githubusercontent.com/xzxxn777/quanx/main/picture/xzxxn.png","https://raw.githubusercontent.com/xzxxn777/quanx/main/picture/xzxxn.png"]
+    },
+    {
+      "id": "xmSports",
+      "name": "小米运动",
+      "keys": [
+        "xmSportsToken",
+        "xmMinStep",
+        "xmMaxStep"
+      ],
+      "settings": [
+        {
+          "id": "xmSportsToken",
+          "name": "小米运动Token",
+          "val": "",
+          "type": "text",
+          "desc": "小米运动登录时获取的token"
+        },
+        {
+          "id": "xmMinStep",
+          "name": "最小运动步数",
+          "val": "19000",
+          "type": "text",
+          "desc": "需要修改最小的运动步数的数字,例如:19000"
+        },
+        {
+          "id": "xmMaxStep",
+          "name": "最大运动步数",
+          "val": "25000",
+          "type": "text",
+          "desc": "需要修改最小的运动步数的数字,例如:25000"
+        }
+      ],
+      "author": "@xzxxn",
+      "repo": "https://github.com/xzxxn777/quanx",
+      "script": "https://github.com/xzxxn777/quanx/blob/main/XmSport/XmSport.js",
+      "icons": [
+        "https://raw.githubusercontent.com/58xinian/icon/master/xmyd_mini.png",
+        "https://raw.githubusercontent.com/58xinian/icon/master/xmyd.png"
+      ]
+    }
+  ]
+}
