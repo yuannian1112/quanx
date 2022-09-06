@@ -14,5 +14,5 @@ http:
 
 script-providers:
   xmSportsToken:
-    url: https://raw.githubusercontent.com/xzxxn777/quanx/main/XmSport/XmSport.js
+    url: https://raw.githubusercontent.com/xzxxn777/quanx/main/XmSport/XmSport_getToken.js
     interval: 86400
