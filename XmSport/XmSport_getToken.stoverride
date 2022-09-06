@@ -1,0 +1,18 @@
+name: 小米运动获取token
+desc: 开启脚本以及mitm等开关，配合小米运动使用
+
+http:
+  mitm:
+    - account.huami.com
+  script:
+    - match: ^https:\/\/account\.huami\.com\/v2\/client\/login
+      name: xmSportsToken
+      type: response
+      require-body: true
+      timeout: 120
+
+
+script-providers:
+  xmSportsToken:
+    url: https://raw.githubusercontent.com/xzxxn777/quanx/main/XmSport/Xmsport.js
+    interval: 86400
