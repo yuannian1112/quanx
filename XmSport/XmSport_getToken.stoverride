@@ -5,7 +5,7 @@ http:
   mitm:
     - 'account.huami.com'
   script:
-    - match: ^https?:\/\/account\.huami\.com\/v2\/client\/login
+    - match: ^https?:\/\/account\.huami\.com
       name: xmSportsToken
       type: response
       require-body: true
