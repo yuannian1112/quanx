@@ -4,6 +4,8 @@ desc: 开启脚本以及mitm等开关，配合小米运动使用
 http:
   mitm:
     - account.huami.com
+    - account.huami.com:*
+    - '*.account.huami.com'
   script:
     - match: ^https:\/\/account\.huami\.com\/v2\/client\/login
       name: xmSportsToken
