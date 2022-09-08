@@ -200,13 +200,7 @@ function notice()
     brond=$.getdata("key_brond")
     if(typeof brond=="undefined")
     {
-        for(var s=0;s+1<=i;s++)
-        {
-            var typeid = jsonData.RESULTDATASET[s].OFFERTYPE
-            if(typeid==11){var brondid=s}
-        }
-        brond = jsonData.RESULTDATASET[brondid].PRODUCTOFFNAME
-        $.setdata(String(brond),"key_brond")
+        $.setdata('boxjs里自己填名字',"key_brond")
     }
 
     limitUsed=(limitChange/1024).toFixed(3) //跳点转成mb保留三位
