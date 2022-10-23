@@ -43,6 +43,29 @@
         "https://raw.githubusercontent.com/58xinian/icon/master/xmyd_mini.png",
         "https://raw.githubusercontent.com/58xinian/icon/master/xmyd.png"
       ]
+    },
+    {
+      "id": "AHDX",
+      "name": "流量来了",
+      "keys": [
+        "AHWX"
+      ],
+      "settings": [
+        {
+          "id": "AHWX",
+          "name": "流量来了Body",
+          "val": "",
+          "type": "text",
+          "desc": "切换登录时获取Body"
+        }
+      ],
+      "author": "@xzxxn",
+      "repo": "https://github.com/xzxxn777/quanx",
+      "script": "https://github.com/xzxxn777/quanx/blob/main/XmSport/XmSport.js",
+      "icons": [
+        "https://raw.githubusercontent.com/58xinian/icon/master/xmyd_mini.png",
+        "https://raw.githubusercontent.com/58xinian/icon/master/xmyd.png"
+      ]
     }
   ]
 }
