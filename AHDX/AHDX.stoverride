@@ -1,0 +1,13 @@
+name: 流量来了签到
+desc: 配合流量来了获取body使用
+
+cron:
+  script:
+    - name: AHDX
+      cron: '1 0 * * *'
+      timeout: 120
+
+script-providers:
+  AHDX:
+    url: https://raw.githubusercontent.com/xzxxn777/quanx/main/AHDX/AHDX.js
+    interval: 86400
