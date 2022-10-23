@@ -5,7 +5,7 @@ hostname = llhb.ah163.net
 
 QuanX
 [rewrite_local]
-# 小米运动获取Token
+# 流量来了获取body
 ^https:\/\/llhb\.ah163\.net\/ah_red_come\/app\/getphone url script-request-body https://raw.githubusercontent.com/xzxxn777/quanx/main/AHDX/AHDX_getBody.js
  */
 const $ = new Env('流量来了获取body');
