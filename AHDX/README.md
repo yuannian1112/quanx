@@ -18,7 +18,7 @@ hostname = llhb.ah163.net
 ### STASH使用方法
 在STASH中安装覆写：
 ```
-https://raw.githubusercontent.com/xzxxn777/quanx/main/AHDX/AHDX_getBody.stoverride
+https://raw.githubusercontent.com/xzxxn777/quanx/main/AHDX/AHDX.stoverride
 ```
 ### 青龙配置（必须）
 上传post-ql.js到青龙scripts目录 新建任务
