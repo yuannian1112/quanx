@@ -48,11 +48,11 @@
       "id": "AHDX",
       "name": "流量来了",
       "keys": [
-        "AHWX"
+        "AHDX"
       ],
       "settings": [
         {
-          "id": "AHWX",
+          "id": "AHDX",
           "name": "流量来了Body",
           "val": "",
           "type": "text",
@@ -62,6 +62,45 @@
       "author": "@xzxxn",
       "repo": "https://github.com/xzxxn777/quanx",
       "script": "https://raw.githubusercontent.com/xzxxn777/quanx/main/AHDX/AHDX.js",
+      "icons": [
+        "https://raw.githubusercontent.com/58xinian/icon/master/xmyd_mini.png",
+        "https://raw.githubusercontent.com/58xinian/icon/master/xmyd.png"
+      ]
+    },
+    {
+      "id": "postql",
+      "name": "上传变量-青龙",
+      "keys": [
+        "qlUrl",
+        "clientSecret",
+        "clientId"
+      ],
+      "settings": [
+        {
+          "id": "qlUrl",
+          "name": "青龙ip地址",
+          "val": "",
+          "type": "text",
+          "desc": "必填"
+        },
+        {
+          "id": "clientSecret",
+          "name": "Client Secret",
+          "val": "",
+          "type": "text",
+          "desc": "必填"
+        },
+        {
+          "id": "clientId",
+          "name": "Client ID",
+          "val": "",
+          "type": "text",
+          "desc": "必填"
+        }
+      ],
+      "author": "@xzxxn",
+      "repo": "https://github.com/xzxxn777/quanx",
+      "script": "https://raw.githubusercontent.com/xzxxn777/quanx/main/AHDX/post-js.js",
       "icons": [
         "https://raw.githubusercontent.com/58xinian/icon/master/xmyd_mini.png",
         "https://raw.githubusercontent.com/58xinian/icon/master/xmyd.png"
