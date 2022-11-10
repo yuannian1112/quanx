@@ -20,6 +20,9 @@ hostname = llhb.ah163.net
 ```
 https://raw.githubusercontent.com/xzxxn777/quanx/main/AHDX/AHDX_getBody.stoverride
 ```
+```
+https://raw.githubusercontent.com/xzxxn777/quanx/main/AHDX/post-ql.stoverride
+```
 ### 青龙配置（必须）
 上传post-ql.js到青龙scripts目录 新建任务
 ```
