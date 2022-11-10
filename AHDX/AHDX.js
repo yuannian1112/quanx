@@ -6,8 +6,10 @@ const r = t.enc.Utf8.parse("hbdxWxSmall96548")
 const n = t.enc.Utf8.parse("6606136474185246")
 
 let ckStr = ($.isNode() ? process.env.AHDX : $.getdata("AHDX")) || "";
+let bark_key = ($.isNode() ? process.env.bark_key : $.getdata("bark_key")) || "";
+let icon_url = ($.isNode() ? process.env.bark_icon : $.getdata("bark_icon")) || "";
+let body1 = '';
 
-let phones = []
 !(async () => {
     let ckArr = await Variable_Check(ckStr, "AHDX");
     for (let index = 0; index < ckArr.length; index++) {
@@ -16,7 +18,7 @@ let phones = []
         ck = ckArr[index].split("&");
         $.message = ''
         $.isSign = false
-        await login(ck)
+        await login(ck,num)
         await isSign()
         await getSign()
     }
@@ -34,16 +36,18 @@ let phones = []
         $.done();
     })
 
-function login(phone) {
+function login(phone,num) {
     return new Promise(resolve => {
         request(taskUrl1("getphone",`{"para":"${phone}"}`), (error, response, body) => {
             if (!error && response.statusCode === 200) {
                 let data = JSON.parse(Decrypt(body))
-                console.log(data)
+                //console.log(data)
                 if (data.code === 0) {
                     $.phone = JSON.parse(data.data).token
                     $.num =(JSON.parse(data.data).user.phone)
                     $.isSign = true
+                } else {
+                    Notice($.name,`第 ${num} 个账号`,`请重新获取body`);
                 }
                 resolve()
             }
@@ -57,7 +61,7 @@ function getSign() {
             if (!error && response.statusCode === 200) {
                 let data = JSON.parse(Decrypt(body))
                 if (data.code === 0) {
-                    $.message += `，本月共计签到${data.data.times}天\n`
+                    Notice($.name,`用户${$.num}`,body1+` 本月共计签到${data.data.times}天`);
                     $.log(`用户${$.num}本月已签到${data.data.times}天`)
                 }
                 resolve()
@@ -79,7 +83,7 @@ function isSign() {
                         $.log("用户未签到，去签到")
                         await userSign()
                     } else {
-                        $.message += `用户${$.num}今日已签到`
+                        body1='今日已签到'
                         $.log(`用户${$.num}今日已签到`)
                     }
                 } else {
@@ -197,6 +201,28 @@ async function Variable_Check(ck, Variables) {
             console.log(` ${$.name}:未填写变量 ${Variables} ,请仔细阅读脚本说明!`);
         }
     });
+}
+
+function Notice(title,body,body1){
+    let bark_title=title
+    let bark_body=body
+    let bark_body1=body1
+    if(bark_key)
+    {
+        let bark_icon
+        if(icon_url){bark_icon=`?icon=${icon_url}`}
+        else {bark_icon=''}
+
+        let bark_other=$.getdata(' ')
+        let effective=bark_icon.indexOf("?icon")
+        if((effective!=-1)&&bark_other){bark_other=`&${bark_other}`}
+        else if((effective==-1)&&bark_other){bark_other=`?${bark_other}`}
+        else{bark_other=''}
+        let url =`${bark_key}${encodeURIComponent(bark_title)}/${encodeURIComponent(bark_body)}${encodeURIComponent('\n')}${encodeURIComponent(bark_body1)}${bark_icon}${bark_other}`
+
+        $.post({url})
+    }else{$.msg(title,body,body1)}
+
 }
 
 // prettier-ignore
