@@ -4,21 +4,23 @@ var request = require('request');
 const t = require('crypto-js');
 const r = t.enc.Utf8.parse("hbdxWxSmall96548")
 const n = t.enc.Utf8.parse("6606136474185246")
-
 let ckStr = ($.isNode() ? process.env.AHDX : $.getdata("AHDX")) || "";
 
-let phones = []
 !(async () => {
-    let ckArr = await Variable_Check(ckStr, "AHDX");
-    for (let index = 0; index < ckArr.length; index++) {
-        let num = index + 1;
-        console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
-        ck = ckArr[index].split("&");
-        $.message = ''
-        $.isSign = false
-        await login(ck)
-        await isSign()
-        await getSign()
+    if (typeof $request !== "undefined") {
+        await getphone();
+    } else {
+        let ckArr = await Variable_Check(ckStr, "AHDX");
+        for (let index = 0; index < ckArr.length; index++) {
+            let num = index + 1;
+            console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
+            ck = ckArr[index].split("&");
+            $.message = ''
+            $.isSign = false
+            await login(ck)
+            await isSign()
+            await getSign()
+        }
     }
     try {
         const notify = $.isNode() ? require('./sendNotify') : '';
@@ -33,6 +35,24 @@ let phones = []
     .finally(() => {
         $.done();
     })
+
+//重写
+function getphone() {
+    if ($request.body) {
+        const ck = JSON.parse($request.body).para;
+        if (ckStr) {
+            if (ckStr.indexOf(ck) == -1) { // 找不到返回 -1
+                ckStr = ckStr + "@" + ck;
+                $.setdata(ckStr, "AHDX");
+                ckList = ckStr.split("@");
+                $.msg($.name + ` 获取第${ckList.length}个 ck 成功: ${ck}`);
+            }
+        } else {
+            $.setdata(ck, "AHDX");
+            $.msg($.name + ` 获取第1个 ck 成功: ${ck}`);
+        }
+    }
+}
 
 function login(phone) {
     return new Promise(resolve => {

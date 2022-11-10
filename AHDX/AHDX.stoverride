@@ -1,10 +1,19 @@
 name: 流量来了签到
-desc: 配合流量来了获取body使用
+desc: 打开小程序登录获取body，不能退出，退出即失效，多账号建议多开微信
 
+http:
+  mitm:
+    - llhb.ah163.net
+  script:
+    - match: ^https:\/\/llhb\.ah163\.net\/ah_red_come\/app\/getphone
+      name: AHDX
+      type: request
+      require-body: true
+      timeout: 120
 cron:
   script:
     - name: AHDX
-      cron: '1 0 * * *'
+      cron: '0 * * * *'
       timeout: 120
 
 script-providers:
