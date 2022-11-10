@@ -33,7 +33,7 @@ function add(addData) {
             url: qlUrl + `/open/auth/token?client_id=${clientId}&client_secret=${clientSecret}`,
             headers: {"Content-Type": "application/json;charset=UTF-8"}
         }, (err, resp, body) => {
-            console.log(body)
+            //console.log(body)
             let token = JSON.parse(body).data.token;
             $.post({
                 url: qlUrl + `/open/envs`,
