@@ -12,12 +12,7 @@ let ckStr = ($.isNode() ? process.env.AHDX : $.getdata("AHDX")) || "";
 let remarks="安徽电信"
 const addData = [];
 !(async () => {
-    let ckArr = await Variable_Check(ckStr, "AHDX");
-    for (let index = 0; index < ckArr.length; index++) {
-        let num = index + 1;
-        ck = ckArr[index].split("&");
-        addData.push({ name: 'AHDX', value: ck[0], remarks});
-    }
+    addData.push({ name: 'AHDX', value: ckStr, remarks});
     await add(addData);
 })()
     .catch((e) => {
