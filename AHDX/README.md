@@ -28,4 +28,10 @@ https://raw.githubusercontent.com/xzxxn777/quanx/main/AHDX/post-ql.stoverride
 ```
 task AHDX.js
 ```
+### bark通知
+变量
+```
+bark_key #bark接口
+bark_icon #bark图标
+```
 感谢[@TuringLabNews](https://t.me/TuringLabNews)提供脚本
