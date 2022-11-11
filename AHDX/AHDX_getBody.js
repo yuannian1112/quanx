@@ -14,7 +14,7 @@ let ckStr = ($.isNode() ? process.env.AHDX : $.getdata("AHDX")) || "";
 
 function getphone() {
     if ($response.body) {
-        const ck = JSON.parse($response.body).para;
+        const ck = $response.body;
         if (ckStr) {
             if (ckStr.indexOf(ck) == -1) { // 找不到返回 -1
                 ckStr = ckStr + "@" + ck;
