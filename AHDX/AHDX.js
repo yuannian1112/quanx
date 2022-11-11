@@ -15,12 +15,13 @@ let body1 = '';
     for (let index = 0; index < ckArr.length; index++) {
         let num = index + 1;
         console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
-        ck = ckArr[index].split("&");
+        cookie = ckArr[index].split("&");
+        phone = JSON.parse(JSON.parse(Decrypt(cookie[0])).data).token
+        //token=ckArr[index].split("&");
         $.message = ''
-        $.isSign = false
-        await login(ck,num)
-        await isSign()
-        await getSign()
+        await getuser(phone,num)
+        await isSign(phone)
+        await getSign(phone)
     }
     try {
         const notify = $.isNode() ? require('./sendNotify') : '';
@@ -36,28 +37,25 @@ let body1 = '';
         $.done();
     })
 
-function login(phone,num) {
-    return new Promise(resolve => {
-        request(taskUrl1("getphone",`{"para":"${phone}"}`), (error, response, body) => {
+function getuser(phone,num) {
+    return new Promise(resolve =>
+        request(taskUrl('getuser', {"queryDate": formatTime(new Date()), "phone": `${phone}`}), (error, response, body) => {
             if (!error && response.statusCode === 200) {
                 let data = JSON.parse(Decrypt(body))
-                //console.log(data)
                 if (data.code === 0) {
-                    $.phone = JSON.parse(data.data).token
-                    $.num =(JSON.parse(data.data).user.phone)
-                    $.isSign = true
+                    $.num =data.data.phone
                 } else {
                     Notice($.name,`第 ${num} 个账号`,`请重新获取body`);
                 }
                 resolve()
             }
         })
-    })
+    )
 }
 
-function getSign() {
+function getSign(phone) {
     return new Promise(resolve => {
-        request(taskUrl('getSign', {"queryDate": formatTime(new Date()), "phone": $.phone}), (error, response, body) => {
+        request(taskUrl('getSign', {"queryDate": formatTime(new Date()), "phone": `${phone}`}), (error, response, body) => {
             if (!error && response.statusCode === 200) {
                 let data = JSON.parse(Decrypt(body))
                 if (data.code === 0) {
@@ -70,18 +68,15 @@ function getSign() {
     })
 }
 
-function isSign() {
+function isSign(phone) {
     return new Promise(resolve => {
-        request(taskUrl('isSign', {
-            "queryDate": formatTime(new Date()),
-            "phone": $.phone
-        }), async (error, response, body) => {
+        request(taskUrl('isSign', {"queryDate": formatTime(new Date()), "phone": `${phone}`}), async (error, response, body) => {
             if (!error && response.statusCode === 200) {
                 let data = JSON.parse(Decrypt(body))
                 if (data.code === 0) {
                     if (data.data === 0) {
                         $.log("用户未签到，去签到")
-                        await userSign()
+                        await userSign(phone)
                     } else {
                         body1='今日已签到'
                         $.log(`用户${$.num}今日已签到`)
@@ -96,12 +91,11 @@ function isSign() {
     })
 }
 
-function userSign() {
+function userSign(phone) {
     return new Promise(resolve => {
-        request(taskUrl('userSign', {"queryDate": formatTime(new Date()), "phone": $.phone}), (error, response, body) => {
+        request(taskUrl('userSign', {"queryDate": formatTime(new Date()), "phone": `${phone}`}), (error, response, body) => {
             if (!error && response.statusCode === 200) {
                 let data = JSON.parse(Decrypt(body))
-                console.log(data)
                 if (data.code === 0) {
                     $.message += `用户${$.num}签到成功🎉\n`
                     $.log(`用户${$.num}签到成功🎉\n`)
@@ -155,19 +149,6 @@ function taskUrl(function_id, body) {
     return {
         url: `https://llhb.ah163.net/ah_red_come/app/${function_id}`,
         body: JSON.stringify({"para": Encrypt(JSON.stringify(body))}),
-        method: 'POST',
-        headers: {
-            'Host': 'llhb.ah163.net',
-            'content-type': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.16(0x18001034) NetType/WIFI Language/zh_CN',
-            'Referer': 'https://servicewechat.com/wx1f62ea786b9aaf30/72/page-frame.html'
-        }
-    }
-}
-function taskUrl1(function_id, body) {
-    return {
-        url: `https://llhb.ah163.net/ah_red_come/app/${function_id}`,
-        body: body,
         method: 'POST',
         headers: {
             'Host': 'llhb.ah163.net',

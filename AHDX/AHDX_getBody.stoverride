@@ -7,7 +7,7 @@ http:
   script:
     - match: ^https:\/\/llhb\.ah163\.net\/ah_red_come\/app\/getphone
       name: AHDXBody
-      type: request
+      type: response
       require-body: true
       timeout: 120
 

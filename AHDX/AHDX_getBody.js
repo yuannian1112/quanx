@@ -6,15 +6,15 @@ hostname = llhb.ah163.net
 QuanX
 [rewrite_local]
 # 流量来了获取body
-^https:\/\/llhb\.ah163\.net\/ah_red_come\/app\/getphone url script-request-body https://raw.githubusercontent.com/xzxxn777/quanx/main/AHDX/AHDX_getBody.js
+^https:\/\/llhb\.ah163\.net\/ah_red_come\/app\/getphone url script-response-body https://raw.githubusercontent.com/xzxxn777/quanx/main/AHDX/AHDX_getBody.js
  */
 const $ = new Env('流量来了获取body');
 let ckStr = ($.isNode() ? process.env.AHDX : $.getdata("AHDX")) || "";
 !(async () => {await getphone();})().catch((e) => {$.log(e)}).finally(() => {$.done({});});
 
 function getphone() {
-    if ($request.body) {
-        const ck = JSON.parse($request.body).para;
+    if ($response.body) {
+        const ck = JSON.parse($response.body).para;
         if (ckStr) {
             if (ckStr.indexOf(ck) == -1) { // 找不到返回 -1
                 ckStr = ckStr + "@" + ck;
