@@ -23,31 +23,52 @@ const addData = [];
     });
 
 function add(addData) {
-    try {
-        $.get({
+    return new Promise(resolve => {
+        const options = {
             url: qlUrl + `/open/auth/token?client_id=${clientId}&client_secret=${clientSecret}`,
             headers: {"Content-Type": "application/json;charset=UTF-8"}
-        }, (err, resp, body) => {
-            //console.log(body)
-            let token = JSON.parse(body).data.token;
-            $.post({
-                url: qlUrl + `/open/envs`,
-                headers: {
-                    "Content-Type": "application/json;charset=UTF-8",
-                    "Authorization": "Bearer " + token
-                },
-                body: JSON.stringify(addData),
-            }, (error, response, body) => {
-                let data = JSON.parse(body);
-                if (data.code == 200) {
-                    console.log('上传成功')
+        }
+        $.get(options, (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let token = JSON.parse(data).data.token;
+                    return new Promise(resolve => {
+                        const options = {
+                            url: qlUrl + `/open/envs`,
+                            headers: {
+                                "Content-Type": "application/json;charset=UTF-8",
+                                "Authorization": "Bearer " + token
+                            },
+                            body: JSON.stringify(addData),
+                        }
+                        $.post(options, (err, resp, data) => {
+                            try {
+                                if (err) {
+                                    console.log(`${JSON.stringify(err)}`)
+                                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                                } else {
+                                    if (JSON.parse(data).code == 200) {
+                                        console.log('上传成功')
+                                    }
+                                }
+                            } catch (e) {
+                                $.logErr(e, resp)
+                            } finally {
+                                resolve();
+                            }
+                        })
+                    })
                 }
-            })
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
         })
-    } catch (e) {
-        console.log(e)
-    }
-
+    })
 }
 
 /**
