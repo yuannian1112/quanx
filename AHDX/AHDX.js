@@ -22,6 +22,7 @@ let body1 = '';
         await getuser(phone,num)
         await isSign(phone)
         await getSign(phone)
+        await $.wait(2000)
     }
     try {
         const notify = $.isNode() ? require('./sendNotify') : '';
