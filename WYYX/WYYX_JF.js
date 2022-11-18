@@ -11,10 +11,13 @@ let noticeBody = '';
             let num = index + 1;
             console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
             cookie = ckArr[index];
-            await  list(cookie);
+            console.log("\n开始做任务")
+            await list(cookie);
             console.log("\n开始拆礼盒")
-            await  getAward(cookie);
-            await  getPoint(cookie);
+            await getAwardNum(cookie);
+            console.log("\n开始积分夺宝")
+            await dbId(cookie);
+            await getPoint(cookie);
             await $.wait(2000)
         }
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
@@ -51,6 +54,8 @@ function list(cookie) {
                         let taskId = tasks[i].taskId;
                         let title = tasks[i].title;
                         await doTask(cookie, taskId, title);
+                        await $.wait(2000)
+                        await reward(cookie, taskId);
                         await $.wait(2000)
                     }
                 }
@@ -98,6 +103,84 @@ function doTask(cookie,taskId,title) {
     })
 }
 
+function reward(cookie,taskId) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://act.you.163.com/act-attendance/task/reward?csrf_token=0eed94dddcb68522c5ad2e1d0c6554d0`,
+            headers: {
+                'Cookie':cookie,
+                'Host': 'act.you.163.com',
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Content-Type': 'application/json',
+                'Origin': 'https://act.you.163.com'
+            },
+            body:JSON.stringify({"taskId":taskId})
+        }
+        $.post(options, (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    if (data1.code == 200) {
+                        console.log("领取礼盒成功")
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function getAwardNum(cookie) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://act.you.163.com/act-attendance/att/v4/index?csrf_token=ee868fb7161145d45fde8e58c5cb016c&__timestamp=1668788431708&`,
+            headers: {
+                'Cookie':cookie,
+                'Host': 'act.you.163.com',
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Content-Type': 'application/json',
+                'Origin': 'https://act.you.163.com'
+            }
+        }
+        $.get(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    if (data1.code == 200) {
+                        let remainStepCount = data1.data.game.remainStepCount;
+                        if (remainStepCount != 0) {
+                            for (let i = 0;i<remainStepCount;i++) {
+                                await getAward(cookie);
+                            }
+                        } else {
+                            console.log("没有礼盒可以拆了！")
+                        }
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
 function getAward(cookie) {
     return new Promise(resolve => {
         const options = {
@@ -123,8 +206,82 @@ function getAward(cookie) {
                     if (data1.code == 200) {
                         let awardName = data1.data.awardDetailsInfoDTOS[0].awardName;
                         console.log("拆礼盒获得："+awardName)
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function dbId(cookie) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://act.you.163.com/napi/act/treasure/point/index?csrf_token=876912e8197106e6b7417c00ac76458a&__timestamp=1668785051125&`,
+            headers: {
+                'Cookie':cookie,
+                'Host': 'act.you.163.com',
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Content-Type': 'application/json',
+                'Origin': 'https://act.you.163.com'
+            }
+        }
+        $.get(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    let id = data1.result.currPeriodItems[0].skuId;
+                    await bet(cookie, id);
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function bet(cookie,id) {
+    return new Promise(async resolve => {
+        const options = {
+            url: `https://act.you.163.com/napi/act/treasure/point/bet?csrf_token=876912e8197106e6b7417c00ac76458a`,
+            headers: {
+                'Cookie': cookie,
+                'Host': 'act.you.163.com',
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Content-Type': 'application/json',
+                'Origin': 'https://act.you.163.com'
+            },
+            body: JSON.stringify({
+                "skuId": id,
+                "points": 1,
+                "date": await getNowFormatDate()
+            }),
+        }
+        $.post(options, (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    if (data1.code == 200) {
+                        console.log(data1.data.msg)
                     } else {
-                        console.log("没有礼盒可以拆了！")
+                        console.log("已投注")
                     }
                 }
             } catch (e) {
@@ -160,7 +317,7 @@ function getPoint(cookie) {
                 } else {
                     let data1 = JSON.parse(data)
                     let jf = data1.data.pagination.total;
-                    console.log("我的积分："+jf)
+                    console.log("\n我的积分："+jf)
                     $.msg($.name,`我的积分：${jf}`)
                 }
             } catch (e) {
@@ -170,6 +327,19 @@ function getPoint(cookie) {
             }
         })
     })
+}
+
+//获取当前日期函数
+function getNowFormatDate() {
+    let date = new Date(),
+        year = date.getFullYear(), //获取完整的年份(4位)
+        month = date.getMonth() + 1, //获取当前月份(0-11,0代表1月)
+        strDate = date.getDate() // 获取当前日(1-31)
+    if (month >= 1 && month <= 9) month = '0' + month // 如果月份是个位数，在前面补0
+    if (strDate >= 0 && strDate <= 9) strDate = '0' + strDate // 如果日是个位数，在前面补0
+
+    let currentdate = `${year}${month}${strDate}`
+    return currentdate
 }
 
 /**
