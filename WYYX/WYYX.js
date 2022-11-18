@@ -10,10 +10,11 @@ hostname = act.you.163.com
 ^https:\/\/act\.you\.163\.com\/act\/napi\/play\/web\/activation\/sign\/standard\/query url script-request-body https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX.js
  */
 const $ = new Env('网易严选-领鸡蛋');
+const isRequest = typeof $request != "undefined"
 let ckStr = ($.isNode() ? process.env.WYYX : $.getdata("WYYX")) || "";
 let noticeBody = '';
 !(async () => {
-    if ($request.headers) {
+    if (isRequest) {
         await getCookie();
     } else {
         let ckArr = await Variable_Check(ckStr, "WYYX");
@@ -29,7 +30,7 @@ let noticeBody = '';
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
 
 function getCookie() {
-    if ($request.headers) {
+    if (isRequest) {
         const header = JSON.parse($response.headers);
         const ck = header.Cookie;
         if (ckStr) {
