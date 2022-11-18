@@ -1,5 +1,7 @@
 /*
 活动入口：网易严选app-个人-领鸡蛋
+[task_local]
+2 0,23 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX.js, tag=网易严选-领鸡蛋, enabled=true
 [MITM]
 hostname = act.you.163.com
 
@@ -11,8 +13,7 @@ const $ = new Env('网易严选-领鸡蛋');
 let ckStr = ($.isNode() ? process.env.WYYX : $.getdata("WYYX")) || "";
 let noticeBody = '';
 !(async () => {
-    //if ($request.body) {
-    if (false) {
+    if ($request.body) {
         await getCookie();
     } else {
         let ckArr = await Variable_Check(ckStr, "WYYX");
@@ -140,6 +141,7 @@ async function Variable_Check(ck, Variables) {
             resolve(ckArr);
         } else {
             console.log(` ${$.name}:未填写变量 ${Variables} ,请仔细阅读脚本说明!`);
+            $.done()
         }
     });
 }
