@@ -31,7 +31,7 @@ let noticeBody = '';
 
 function getCookie() {
     if (isRequest) {
-        const header = JSON.parse($response.headers);
+        const header = JSON.parse($request.headers);
         const ck = header.Cookie;
         if (ckStr) {
             $.setdata("", "WYYX");
