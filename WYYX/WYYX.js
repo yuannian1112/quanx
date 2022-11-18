@@ -31,8 +31,7 @@ let noticeBody = '';
 
 function getCookie() {
     if (isRequest) {
-        const header = JSON.parse($request.headers);
-        const ck = header.Cookie;
+        const ck = $request.headers["Cookie"]
         if (ckStr) {
             $.setdata("", "WYYX");
             if (ckStr.indexOf(ck) == -1) { // 找不到返回 -1
