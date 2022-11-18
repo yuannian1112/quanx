@@ -21,7 +21,7 @@ let noticeBody = '';
         for (let index = 0; index < ckArr.length; index++) {
             let num = index + 1;
             console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
-            cookie = ckArr[index].split("&");
+            cookie = ckArr[index];
             await  sign(cookie);
             await query(cookie,num);
             await $.wait(2000)
