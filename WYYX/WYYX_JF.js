@@ -179,12 +179,8 @@ async function Variable_Check(ck, Variables) {
     return new Promise((resolve) => {
         let ckArr = [];
         if (ck) {
-            if (ck.indexOf("@") !== -1) {
-                ck.split("@").forEach((item) => {
-                    ckArr.push(item);
-                });
-            } else if (ck.indexOf("\n") !== -1) {
-                ck.split("\n").forEach((item) => {
+            if (ck.indexOf("?") !== -1) {
+                ck.split("?").forEach((item) => {
                     ckArr.push(item);
                 });
             } else {
