@@ -13,7 +13,7 @@ const $ = new Env('网易严选-领鸡蛋');
 let ckStr = ($.isNode() ? process.env.WYYX : $.getdata("WYYX")) || "";
 let noticeBody = '';
 !(async () => {
-    if ($request.body) {
+    if ($request.headers) {
         await getCookie();
     } else {
         let ckArr = await Variable_Check(ckStr, "WYYX");
@@ -29,7 +29,7 @@ let noticeBody = '';
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
 
 function getCookie() {
-    if ($request.body) {
+    if ($request.headers) {
         const header = JSON.parse($response.headers);
         const ck = header.Cookie;
         if (ckStr) {
