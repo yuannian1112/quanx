@@ -1,3 +1,7 @@
+/*
+[task_local]
+30 0,23 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX_JF.js, tag=网易严选-积分, enabled=true
+*/
 const $ = new Env('网易严选-积分');
 let ckStr = ($.isNode() ? process.env.WYYX : $.getdata("WYYX")) || "";
 let noticeBody = '';
@@ -155,7 +159,9 @@ function getPoint(cookie) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
-                    console.log("我的积分："+data1.data.pagination.total)
+                    let jf = data1.data.pagination.total;
+                    console.log("我的积分："+jf)
+                    $.msg($.name,`我的积分：${jf}`)
                 }
             } catch (e) {
                 $.logErr(e, resp)
