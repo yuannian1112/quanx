@@ -29,6 +29,7 @@ let codeStr = ($.isNode() ? process.env.WYYXCODE : $.getdata("WYYXCODE")) || "";
             await help(cookie,code);
             await $.wait(2000)
         }
+        $.setdata("", "WYYXCODE");
     }
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
 
