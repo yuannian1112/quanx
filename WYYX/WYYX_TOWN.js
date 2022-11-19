@@ -4,7 +4,6 @@
 */
 const $ = new Env('网易严选-严选家园');
 let ckStr = ($.isNode() ? process.env.WYYX : $.getdata("WYYX")) || "";
-let codeStr = ($.isNode() ? process.env.WYYXCODE : $.getdata("WYYXCODE")) || "";
 !(async () => {
     let ckArr = await Variable_Check(ckStr, "WYYX");
     for (let index = 0; index < ckArr.length; index++) {
@@ -24,6 +23,7 @@ let codeStr = ($.isNode() ? process.env.WYYXCODE : $.getdata("WYYXCODE")) || "";
         await $.wait(2000)
     }
     console.log("\n开始助力")
+    let codeStr = ($.isNode() ? process.env.WYYXCODE : $.getdata("WYYXCODE")) || "";
     let codeArr = await Variable_Check(codeStr, "WYYXCODE");
     for (let index = 0; index < codeArr.length; index++) {
         code = codeArr[index];
