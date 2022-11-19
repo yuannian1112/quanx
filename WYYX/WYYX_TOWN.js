@@ -22,15 +22,15 @@ let codeStr = ($.isNode() ? process.env.WYYXCODE : $.getdata("WYYXCODE")) || "";
         console.log("\n开始做任务")
         await taskList(cookie);
         await $.wait(2000)
-        console.log("\n开始助力")
-        let codeArr = await Variable_Check(codeStr, "WYYXCODE");
-        for (let index = 0; index < codeArr.length; index++) {
-            code = codeArr[index];
-            await help(cookie,code);
-            await $.wait(2000)
-        }
-        $.setdata("", "WYYXCODE");
     }
+    console.log("\n开始助力")
+    let codeArr = await Variable_Check(codeStr, "WYYXCODE");
+    for (let index = 0; index < codeArr.length; index++) {
+        code = codeArr[index];
+        await help(cookie,code);
+        await $.wait(2000)
+    }
+    $.setdata("", "WYYXCODE");
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
 
 function queryInfo(cookie,num) {
@@ -126,7 +126,7 @@ function queryTown(cookie,taskId,title) {
                         let price = upgradeRequire.price;
                         if (upgradeRequire.userMaterialDTOList != null) {
                             let materialName = upgradeRequire.userMaterialDTOList[0].materialName;
-                            let count = upgradeRequire.userMaterialDTOList[0].count;
+                            let count = upgradeRequire.userMaterialDTOList[0].upgradeCount;
                             console.log("升级需要：金币：" + price + " " + materialName + "：" + count + "个")
                         } else {
                             console.log("升级需要：" + "金币：" + price)
