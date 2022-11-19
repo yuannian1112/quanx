@@ -1,6 +1,6 @@
 /*
 [task_local]
-30 0,23 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX_JF.js, tag=网易严选-积分, enabled=true
+10 0,23 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX_JF.js, tag=网易严选-积分, enabled=true
 */
 const $ = new Env('网易严选-积分');
 let ckStr = ($.isNode() ? process.env.WYYX : $.getdata("WYYX")) || "";

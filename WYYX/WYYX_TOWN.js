@@ -1,6 +1,6 @@
 /*
 [task_local]
-30 0,23 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX_TOWN.js, tag=网易严选-严选家园, enabled=true
+20 0-23/3 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX_TOWN.js, tag=网易严选-严选家园, enabled=true
 */
 const $ = new Env('网易严选-严选家园');
 let ckStr = ($.isNode() ? process.env.WYYX : $.getdata("WYYX")) || "";
@@ -399,12 +399,15 @@ function taskList(cookie) {
                         }
                         let title = tasks[i].title;
                         let coin = tasks[i].reward;
-                        //await doTask(cookie, taskId, title,reward);
-                        await $.wait(2000)
-                        await reward(cookie, taskId,coin);
-                        //await doTask1(cookie, taskId, title,reward);
-                        await $.wait(2000)
-                        //await reward(cookie, taskId);
+                        // if(taskId==316){
+                        //     await doTask1(cookie, taskId, title);
+                        //     await $.wait(2000)
+                        //     await reward(cookie, taskId,coin);
+                        // } else {
+                        //     await doTask(cookie, taskId, title);
+                        //     await $.wait(2000)
+                        //     await reward(cookie, taskId,coin);
+                        // }
                     }
                 }
             } catch (e) {
@@ -416,7 +419,7 @@ function taskList(cookie) {
     })
 }
 
-function doTask(cookie,taskId,title,reward) {
+function doTask(cookie,taskId,title) {
     return new Promise(resolve => {
         const options = {
             url: `https://m.you.163.com/act/napi/wishtown/task/trigger.json`,
@@ -453,7 +456,7 @@ function doTask(cookie,taskId,title,reward) {
     })
 }
 
-function doTask1(cookie,taskId,title,reward) {
+function doTask1(cookie,taskId,title) {
     return new Promise(resolve => {
         const options = {
             url: `https://act.you.163.com/napi/play/web/taskT/task/trigger?_=1668843957963`,
