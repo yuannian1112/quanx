@@ -1,72 +1,49 @@
 /*
-打开个人-积分-获取ck
-活动入口：网易严选app-个人-领鸡蛋
 [task_local]
-2 0,23 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX.js, tag=网易严选-领鸡蛋, enabled=true
-[MITM]
-hostname = m.you.163.com
-
-[rewrite_local]
-# 网易严选获取cookie
-^https:\/\/m\.you\.163\.com\/xhr\/points\/index.json/? url script-request-header https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX.js
- */
-const $ = new Env('网易严选-领鸡蛋');
-const isRequest = typeof $request != "undefined"
+30 0,23 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX_JF.js, tag=网易严选-积分, enabled=true
+*/
+const $ = new Env('蒙牛');
 let ckStr = ($.isNode() ? process.env.WYYX : $.getdata("WYYX")) || "";
 let noticeBody = '';
 !(async () => {
-    if (isRequest) {
-        await getCookie();
-    } else {
-        let ckArr = await Variable_Check(ckStr, "WYYX");
-        for (let index = 0; index < ckArr.length; index++) {
-            let num = index + 1;
-            console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
-            cookie = ckArr[index];
-            await  sign(cookie);
-            await query(cookie,num);
-            await $.wait(2000)
-        }
-    }
+    // let ckArr = await Variable_Check(ckStr, "WYYX");
+    // for (let index = 0; index < ckArr.length; index++) {
+    //     let num = index + 1;
+    //     console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
+    //     cookie = ckArr[index];
+    //     console.log("\n开始抽奖")
+    //     await lottery(cookie);
+    //
+    //     await $.wait(2000)
+    // }
+    await lottery();
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
 
-function getCookie() {
-    if (isRequest) {
-        const ck = $request.headers["Cookie"]
-        if (ckStr) {
-            if (ckStr.indexOf(ck) == -1) { // 找不到返回 -1
-                ckStr = ckStr + "?" + ck;
-                $.setdata(ckStr, "WYYX");
-                ckList = ckStr.split("?");
-                $.msg($.name + ` 获取第${ckList.length}个 ck 成功: ${ck}`);
-            }
-        } else {
-            $.setdata(ck, "WYYX");
-            $.msg($.name + ` 获取第1个 ck 成功: ${ck}`);
-        }
-    }
-    $.done({})
-}
 
-function query(cookie,num) {
+function lottery() {
     return new Promise(resolve => {
         const options = {
-            url: `https://act.you.163.com/act/napi/play/web/activation/sign/standard/query`,
+            url: `https://m.pailifan.com/xcx/v2/do_lottery`,
             headers: {
-                'X-Requested-With' : `XMLHttpRequest`,
-                'x-csrf-token' : ``,
-                'Connection' : `keep-alive`,
-                'Accept-Encoding' : `gzip, deflate, br`,
-                'Content-Type' : `application/json`,
-                'Origin' : `https://act.you.163.com`,
-                'User-Agent' : `Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 yanxuan/7.6.8 device-id/ed179fedbfda9a7c5c9d462616c7bd96 app-chan-id/AppStore trustId/ios_trustid_781b2e99fe3a488eab858e05e4d48d63`,
-                'Cookie' :cookie,
-                'Referer' : `https://act.you.163.com/act/pub/oly_RZXrqPgbLM483xa9.html`,
-                'Host' : `act.you.163.com`,
-                'Accept-Language' : `zh-CN,zh-Hans;q=0.9`,
-                'Accept' : `application/json, text/javascript, */*; q=0.01`
+                'Host': 'm.pailifan.com',
+                'Connection': 'keep-alive',
+                    'Content-Length': '512',
+                    'system': 'iOS 16.2',
+                    't': '1668823051',
+                    'VERSION': '2022072802',
+                    'deviceOrientation': 'portrait',
+                    'platform': 'ios',
+                'model': 'iPhone 14 Pro<iPhone15,2>',
+                'size': '390,741',
+                'content-type': 'application/json',
+                'brand': 'iPhone',
+                'token': 'It/opdR/CWIuBQQdkZY7j0lar5TcMP7BmDXc1nOGqeFwHI+fWLs6G6xA1cPyVKOOyUTLQL6VfxOAne5WoS0KpvT3Q7Z77y5MulIUNNtgDuY1ExOpV5S8b3wQ1iEHEODTW/3jtGklnWLUHtGqRZAUVrEhT0rV26R+ihXW+0OSEe/TPXZiIbxR3XzBRdAuP7ijKWmAfCmj2CRvkX95AGgAeFya2nO1S6GEdeWlYNKxvdKj9/kGuLmueG5Y2VQiPaWd',
+                'b': '2617',
+                'Accept-Encoding': 'gzip,compress,br,deflate',
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.30(0x18001e28) NetType/WIFI Language/zh_CN',
+                'Referer': 'https://servicewechat.com/wx2e7a6973da6a1b54/665/page-frame.html'
             },
-            body:JSON.stringify({"schemaId":21})
+            body:JSON.stringify({"encode":"usscU4wxaaCB59ZVmzqU+Cut/hnt4aboYzav+iXFb3Zfrw4e/gPIzpNdOdx2odzfxYNJvwF6sxBDMnz7JSTir8kvUpVxC81P9JuHvMdMvors4DvYpgPsIvPkHLRCGU2TcfWHGUXptKtIFvaXg8iJXv3h8MBs/onAV60KvDy8T0jYXpvnBGJG4E/Mh09+wcldfq8gavTOp3KkEpSDMhT97cgo/mQhwo/z+cC8oOBYI2f7QnkiCaDVDEUV+yc5kqnEZC8V0Id+zPM6dkDz4PZ0lG6gDitOfmkLKh2iBO4ZkjtNPMeuNNz3VzlyXuakGiM8pk9XFA4DAJuVZFvbYZNcEqIta6z4hDjA/EhrNjwI/9LDA2mlQpsrKbCJpbdmkYvYSkBX0YPD7l/n72o/Id67E61zHksCBqU/xLwpIQqk8KTFcEaBfJbaJvMDNFASWDHA0g3OlLqsVIH35IOZU5zbNw==","t":1668823051,"bd":"2617"})
         }
         $.post(options, (err, resp, data) => {
             try {
@@ -75,7 +52,8 @@ function query(cookie,num) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
-                    $.msg($.name,`第${num}个账号 ${noticeBody}`,`签到情况：已签${data1.result.userTask.taskCurrValue}/${data1.result.userTask.taskTargetValue}天`)
+
+                    console.log(data1)
                 }
             } catch (e) {
                 $.logErr(e, resp)
@@ -86,38 +64,17 @@ function query(cookie,num) {
     })
 }
 
-function sign(cookie) {
-    return new Promise(resolve => {
-        const options = {
-            url: `https://act.you.163.com/act/napi/play/web/activation/sign/try.json?csrf_token=a23fca337d71ddfec2948ea53dd49d38`,
-            headers: {
-                'Cookie':cookie,
-                'Host': 'act.you.163.com',
-                'Accept': 'application/json, text/javascript, */*; q=0.01',
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'Content-Type': 'application/json',
-                'Origin': 'https://act.you.163.com'
-            }
-        }
-        $.post(options, (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
-                } else {
-                    let data1 = JSON.parse(data)
-                    console.log(data1.msg)
-                    noticeBody = data1.msg
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve();
-            }
-        })
-    })
+//获取当前日期函数
+function getNowFormatDate() {
+    let date = new Date(),
+        year = date.getFullYear(), //获取完整的年份(4位)
+        month = date.getMonth() + 1, //获取当前月份(0-11,0代表1月)
+        strDate = date.getDate() // 获取当前日(1-31)
+    if (month >= 1 && month <= 9) month = '0' + month // 如果月份是个位数，在前面补0
+    if (strDate >= 0 && strDate <= 9) strDate = '0' + strDate // 如果日是个位数，在前面补0
+
+    let currentdate = `${year}${month}${strDate}`
+    return currentdate
 }
 
 /**

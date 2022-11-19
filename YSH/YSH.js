@@ -1,81 +1,38 @@
 /*
-打开个人-积分-获取ck
-活动入口：网易严选app-个人-领鸡蛋
 [task_local]
-2 0,23 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX.js, tag=网易严选-领鸡蛋, enabled=true
-[MITM]
-hostname = m.you.163.com
-
-[rewrite_local]
-# 网易严选获取cookie
-^https:\/\/m\.you\.163\.com\/xhr\/points\/index.json/? url script-request-header https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX.js
- */
-const $ = new Env('网易严选-领鸡蛋');
-const isRequest = typeof $request != "undefined"
-let ckStr = ($.isNode() ? process.env.WYYX : $.getdata("WYYX")) || "";
-let noticeBody = '';
+30 0,23 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX_TOWN.js, tag=网易严选-严选家园, enabled=true
+*/
+const $ = new Env('网易严选-严选家园');
 !(async () => {
-    if (isRequest) {
-        await getCookie();
-    } else {
-        let ckArr = await Variable_Check(ckStr, "WYYX");
-        for (let index = 0; index < ckArr.length; index++) {
-            let num = index + 1;
-            console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
-            cookie = ckArr[index];
-            await  sign(cookie);
-            await query(cookie,num);
-            await $.wait(2000)
-        }
-    }
+
+        await query();
+        await draw();
+
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
 
-function getCookie() {
-    if (isRequest) {
-        const ck = $request.headers["Cookie"]
-        if (ckStr) {
-            if (ckStr.indexOf(ck) == -1) { // 找不到返回 -1
-                ckStr = ckStr + "?" + ck;
-                $.setdata(ckStr, "WYYX");
-                ckList = ckStr.split("?");
-                $.msg($.name + ` 获取第${ckList.length}个 ck 成功: ${ck}`);
-            }
-        } else {
-            $.setdata(ck, "WYYX");
-            $.msg($.name + ` 获取第1个 ck 成功: ${ck}`);
-        }
-    }
-    $.done({})
-}
-
-function query(cookie,num) {
+function query() {
     return new Promise(resolve => {
         const options = {
-            url: `https://act.you.163.com/act/napi/play/web/activation/sign/standard/query`,
+            url: `https://youshenghuo.11185.cn/ZxptRestYshWECHAT/evt/activity/index?id=100047`,
             headers: {
-                'X-Requested-With' : `XMLHttpRequest`,
-                'x-csrf-token' : ``,
-                'Connection' : `keep-alive`,
-                'Accept-Encoding' : `gzip, deflate, br`,
-                'Content-Type' : `application/json`,
-                'Origin' : `https://act.you.163.com`,
-                'User-Agent' : `Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 yanxuan/7.6.8 device-id/ed179fedbfda9a7c5c9d462616c7bd96 app-chan-id/AppStore trustId/ios_trustid_781b2e99fe3a488eab858e05e4d48d63`,
-                'Cookie' :cookie,
-                'Referer' : `https://act.you.163.com/act/pub/oly_RZXrqPgbLM483xa9.html`,
-                'Host' : `act.you.163.com`,
-                'Accept-Language' : `zh-CN,zh-Hans;q=0.9`,
-                'Accept' : `application/json, text/javascript, */*; q=0.01`
+                'Host': 'youshenghuo.11185.cn',
+        'accept': 'application/json, text/plain, */*',
+                'channel': 'wechat',
+                'referer': 'https://youshenghuo.11185.cn/wx/',
+                'accept-language': 'zh-CN,zh-Hans;q=0.9',
+                'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.30(0x18001e29) NetType/WIFI Language/zh_CN',
+                'authorization': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0aW1lIjoiMTY2ODg0NTc5NzY0MCIsInVzZXJJZCI6Ijc1OTk1MDY4In0.junc-V_EOnvQWqCZoS3Ztys5hv_UFfXLgLsygwLtaWg',
+                'accept-encoding': 'gzip, deflate, br'
             },
-            body:JSON.stringify({"schemaId":21})
         }
-        $.post(options, (err, resp, data) => {
+        $.get(options, (err, resp, data) => {
             try {
                 if (err) {
                     console.log(`${JSON.stringify(err)}`)
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
-                    $.msg($.name,`第${num}个账号 ${noticeBody}`,`签到情况：已签${data1.result.userTask.taskCurrValue}/${data1.result.userTask.taskTargetValue}天`)
+                   // console.log(data1)
                 }
             } catch (e) {
                 $.logErr(e, resp)
@@ -86,20 +43,25 @@ function query(cookie,num) {
     })
 }
 
-function sign(cookie) {
+function draw() {
     return new Promise(resolve => {
         const options = {
-            url: `https://act.you.163.com/act/napi/play/web/activation/sign/try.json?csrf_token=a23fca337d71ddfec2948ea53dd49d38`,
+            url: `https://youshenghuo.11185.cn/ZxptRestYshWECHAT/evt/activity/draw`,
             headers: {
-                'Cookie':cookie,
-                'Host': 'act.you.163.com',
-                'Accept': 'application/json, text/javascript, */*; q=0.01',
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'Content-Type': 'application/json',
-                'Origin': 'https://act.you.163.com'
-            }
+                'Host': 'youshenghuo.11185.cn',
+                'accept': 'application/json, text/plain, */*',
+                'channel': 'wechat',
+                'referer': 'https://youshenghuo.11185.cn/wx/',
+                'accept-language': 'zh-CN,zh-Hans;q=0.9',
+                'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.30(0x18001e29) NetType/WIFI Language/zh_CN',
+                'authorization': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0aW1lIjoiMTY2ODg0NTc5NzY0MCIsInVzZXJJZCI6Ijc1OTk1MDY4In0.junc-V_EOnvQWqCZoS3Ztys5hv_UFfXLgLsygwLtaWg',
+                'accept-encoding': 'gzip, deflate, br'
+            },
+            body: JSON.stringify({
+                "activityId": 100047,
+                "prizeId": 186,
+                "playsId": 504
+            }),
         }
         $.post(options, (err, resp, data) => {
             try {
@@ -108,8 +70,7 @@ function sign(cookie) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
-                    console.log(data1.msg)
-                    noticeBody = data1.msg
+                    console.log(data1)
                 }
             } catch (e) {
                 $.logErr(e, resp)
@@ -118,6 +79,19 @@ function sign(cookie) {
             }
         })
     })
+}
+
+//获取当前日期函数
+function getNowFormatDate() {
+    let date = new Date(),
+        year = date.getFullYear(), //获取完整的年份(4位)
+        month = date.getMonth() + 1, //获取当前月份(0-11,0代表1月)
+        strDate = date.getDate() // 获取当前日(1-31)
+    if (month >= 1 && month <= 9) month = '0' + month // 如果月份是个位数，在前面补0
+    if (strDate >= 0 && strDate <= 9) strDate = '0' + strDate // 如果日是个位数，在前面补0
+
+    let currentdate = `${year}${month}${strDate}`
+    return currentdate
 }
 
 /**
