@@ -4,7 +4,7 @@
 */
 const $ = new Env('网易严选-严选家园');
 let ckStr = ($.isNode() ? process.env.WYYX : $.getdata("WYYX")) || "";
-let noticeBody = '';
+let codeStr = ($.isNode() ? process.env.WYYXCODE : $.getdata("WYYXCODE")) || "";
 !(async () => {
     let ckArr = await Variable_Check(ckStr, "WYYX");
     for (let index = 0; index < ckArr.length; index++) {
@@ -16,6 +16,14 @@ let noticeBody = '';
         await $.wait(2000)
         console.log("\n开始做任务")
         await taskList(cookie);
+        await $.wait(2000)
+        console.log("\n开始助力")
+        let codeArr = await Variable_Check(codeStr, "WYYXCODE");
+        for (let index = 0; index < codeArr.length; index++) {
+            code = codeArr[index];
+            await help(cookie,code);
+            await $.wait(2000)
+        }
     }
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
 
@@ -237,6 +245,20 @@ function taskList(cookie) {
                     //console.log(tasks)
                     for (let i = 0; i < tasks.length; i++) {
                         let taskId = tasks[i].taskId;
+                        if(taskId==333){
+                            let code=tasks[i].redirectUrl.match(/sk=([^& ]+)/)[1];
+                            if (codeStr) {
+                                if (codeStr.indexOf(code) == -1) { // 找不到返回 -1
+                                    codeStr = codeStr + "?" + code;
+                                    $.setdata(codeStr, "WYYXCODE");
+                                    codeList = codeStr.split("?");
+                                    console.log(`获取第${codeList.length}个助力码成功: ${code}`);
+                                }
+                            } else {
+                                $.setdata(code, "WYYXCODE");
+                                console.log(`获取第1个助力码成功: ${code}`);
+                            }
+                        }
                         let title = tasks[i].title;
                         let coin = tasks[i].reward;
                         //await doTask(cookie, taskId, title,reward);
@@ -356,6 +378,34 @@ function reward(cookie,taskId,coin) {
                     if (data1.code == 200) {
                         console.log("获得金币"+coin)
                     }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function help(cookie,code) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://act.you.163.com/act/napi/wishtown/task/help.json?csrf_token=14309d5ac24a84135edd38464d4fb8c7`,
+            headers: {
+                "Content-Type":"application/json;charset=UTF-8",
+                'Cookie':cookie,
+            },
+            body:JSON.stringify({"sk":code})
+        }
+        $.post(options, (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    console.log(data1.msg)
                 }
             } catch (e) {
                 $.logErr(e, resp)

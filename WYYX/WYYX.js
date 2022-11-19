@@ -1,4 +1,5 @@
 /*
+打开个人-积分-获取ck
 活动入口：网易严选app-个人-领鸡蛋
 [task_local]
 2 0,23 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX.js, tag=网易严选-领鸡蛋, enabled=true
@@ -7,7 +8,7 @@ hostname = act.you.163.com
 
 [rewrite_local]
 # 网易严选获取cookie
-^https:\/\/act\.you\.163\.com\/act\/napi\/play\/web\/activation\/sign\/standard\/query url script-request-body https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX.js
+^https:\/\/m\.you\.163\.com\/xhr\/points\/index\.json url script-request-body https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX.js
  */
 const $ = new Env('网易严选-领鸡蛋');
 const isRequest = typeof $request != "undefined"
@@ -33,11 +34,10 @@ function getCookie() {
     if (isRequest) {
         const ck = $request.headers["Cookie"]
         if (ckStr) {
-            $.setdata("", "WYYX");
             if (ckStr.indexOf(ck) == -1) { // 找不到返回 -1
-                ckStr = ckStr + "@" + ck;
+                ckStr = ckStr + "?" + ck;
                 $.setdata(ckStr, "WYYX");
-                ckList = ckStr.split("@");
+                ckList = ckStr.split("?");
                 $.msg($.name + ` 获取第${ckList.length}个 ck 成功: ${ck}`);
             }
         } else {

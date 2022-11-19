@@ -296,7 +296,7 @@ function bet(cookie,id) {
 function getPoint(cookie) {
     return new Promise(resolve => {
         const options = {
-            url: `https://m.you.163.com/xhr/points/getPointFlow.json?csrf_token=866654d645311126a8636ff288ef9883`,
+            url: `https://m.you.163.com/xhr/points/index.json?csrf_token=6e8e21a87833576b81824d04f0157b27`,
             headers: {
                 'Cookie':cookie,
                 'Host': 'm.you.163.com',
@@ -307,7 +307,6 @@ function getPoint(cookie) {
                 'Content-Type': 'application/json',
                 'Origin': 'https://m.you.163.com'
             },
-            body:"type=1&page=1&size=20"
         }
         $.post(options, (err, resp, data) => {
             try {
@@ -316,7 +315,7 @@ function getPoint(cookie) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
-                    let jf = data1.data.pagination.total;
+                    let jf = data1.data.availablePoint;
                     console.log("\n我的积分："+jf)
                     $.msg($.name,`我的积分：${jf}`)
                 }
