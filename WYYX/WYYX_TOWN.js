@@ -26,10 +26,15 @@ let codeStr;
     console.log("\n开始助力")
     codeStr = ($.isNode() ? process.env.WYYXCODE : $.getdata("WYYXCODE")) || "";
     let codeArr = await Variable_Check(codeStr, "WYYXCODE");
-    for (let index = 0; index < codeArr.length; index++) {
-        code = codeArr[index];
-        await help(cookie,code);
-        await $.wait(2000)
+    for (let index = 0; index < ckArr.length; index++) {
+        let num = index + 1;
+        console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
+        cookie = ckArr[index];
+        for (let index1 = 0; index1 < codeArr.length; index1++) {
+            code = codeArr[index1];
+            await help(cookie, code);
+            await $.wait(2000)
+        }
     }
     $.setdata("", "WYYXCODE");
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
