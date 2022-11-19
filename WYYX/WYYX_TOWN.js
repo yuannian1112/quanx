@@ -386,6 +386,7 @@ function taskList(cookie) {
                         let taskId = tasks[i].taskId;
                         if(taskId==333){
                             let code=tasks[i].redirectUrl.match(/sk=([^& ]+)/)[1];
+                            codeStr = ($.isNode() ? process.env.WYYXCODE : $.getdata("WYYXCODE")) || "";
                             if (codeStr) {
                                 if (codeStr.indexOf(code) == -1) { // 找不到返回 -1
                                     codeStr = codeStr + "?" + code;
