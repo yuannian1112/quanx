@@ -17,7 +17,7 @@ let noticeBody = '';
             await getAwardNum(cookie);
             console.log("\n开始积分夺宝")
             await dbId(cookie);
-            await getPoint(cookie);
+            await getPoint(cookie,num);
             await $.wait(2000)
         }
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
@@ -293,7 +293,7 @@ function bet(cookie,id) {
     })
 }
 
-function getPoint(cookie) {
+function getPoint(cookie,num) {
     return new Promise(resolve => {
         const options = {
             url: `https://m.you.163.com/xhr/points/index.json?csrf_token=6e8e21a87833576b81824d04f0157b27`,
@@ -317,7 +317,7 @@ function getPoint(cookie) {
                     let data1 = JSON.parse(data)
                     let jf = data1.data.availablePoint;
                     console.log("\n我的积分："+jf)
-                    $.msg($.name,`我的积分：${jf}`)
+                    $.msg($.name,`第${num}个账号`,`我的积分：${jf}`)
                 }
             } catch (e) {
                 $.logErr(e, resp)

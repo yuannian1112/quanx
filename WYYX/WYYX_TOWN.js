@@ -11,7 +11,12 @@ let codeStr = ($.isNode() ? process.env.WYYXCODE : $.getdata("WYYXCODE")) || "";
         let num = index + 1;
         console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
         cookie = ckArr[index];
-        await queryInfo(cookie);
+        await queryInfo(cookie,num);
+        await $.wait(2000)
+        console.log("\n未建造建筑：")
+        await buildList(cookie);
+        await $.wait(2000)
+        console.log("\n拥有建筑：")
         await queryTown(cookie);
         await $.wait(2000)
         console.log("\n开始做任务")
@@ -27,7 +32,7 @@ let codeStr = ($.isNode() ? process.env.WYYXCODE : $.getdata("WYYXCODE")) || "";
     }
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
 
-function queryInfo(cookie) {
+function queryInfo(cookie,num) {
     return new Promise(resolve => {
         const options = {
             url: `https://m.you.163.com/act/napi/wishtown/assets/query.json?csrf_token=365761ff59bfc2e276233dd9f7de0fa4&__timestamp=1668835881560&`,
@@ -66,6 +71,15 @@ function queryInfo(cookie) {
                         if (data1.result[i].type==3) {
                             let count = data1.result[i].count;
                             console.log("拥有钻石："+count)
+                            $.msg($.name,`第${num}个账号`,`拥有钻石：${count}`)
+                        }
+                        if (data1.result[i].type==4) {
+                            let count = data1.result[i].count;
+                            console.log("拥有建筑许可证："+count)
+                        }
+                        if (data1.result[i].type==5) {
+                            let count = data1.result[i].count;
+                            console.log("拥有扩建许可证："+count)
                         }
                     }
                 }
@@ -106,7 +120,7 @@ function queryTown(cookie,taskId,title) {
                         let downName = downList[i].buildName;
                         let downLevel = downList[i].level;
                         let buildId = downList[i].buildId;
-                        console.log("\n建筑：" + downName + " 当前等级：" + downLevel)
+                        console.log("建筑：" + downName + " 当前等级：" + downLevel)
                         let upgradeRequire = downList[i].upgradeRequire;
                         let price = upgradeRequire.price;
                         if (upgradeRequire.userMaterialDTOList != null) {
@@ -121,7 +135,7 @@ function queryTown(cookie,taskId,title) {
                             console.log("开始升级")
                             await upgrade(cookie,buildId);
                         }
-                        if (buildId==2&&downLevel<=10){
+                        if (buildId!=1&&downLevel<=10){
                             console.log("开始升级")
                             await upgrade(cookie,buildId);
                         }
@@ -131,6 +145,129 @@ function queryTown(cookie,taskId,title) {
                     for (let i = 0; i < downList.length; i++) {
                         let buildId = downList[i].buildId;
                         await collectCoin(cookie, buildId);
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function buildList(cookie,taskId,title) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://m.you.163.com/act/napi/wishtown/building/list.json?__timestamp=1668865533554&`,
+            headers: {
+                'Cookie':cookie,
+                'Host': 'm.you.163.com',
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Content-Type': 'application/json',
+                'referer': 'https://m.you.163.com/wishland'
+            }
+        }
+        $.get(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    let downList = data1.result;
+                    for (let i = 0; i < downList.length; i++) {
+                        if (downList[i].status==0){
+                            let buildName = downList[i].buildName;
+                            let buyingPrice = downList[i].buyingPrice;
+                            let buildId = downList[i].buildId;
+                            let position = downList[i].position;
+                            console.log("建筑："+buildName)
+                            console.log("建造需要：金币："+buyingPrice+"建筑许可证：1个")
+                            console.log("去购买")
+                            await $.wait(2000)
+                            await buy(cookie,buildId,position)
+                        }
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function buy(cookie,buildId,position) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://m.you.163.com/act/napi/wishtown/building/buy.json`,
+            headers: {
+                'Host': 'm.you.163.com',
+                'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'accept': 'application/json, text/javascript, */*; q=0.01',
+                'accept-language': 'zh-CN,zh-Hans;q=0.9',
+                'accept-encoding': 'gzip, deflate, br',
+                'origin': 'https://m.you.163.com',
+                'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 yanxuan/7.6.8 device-id/ed179fedbfda9a7c5c9d462616c7bd96 app-chan-id/AppStore trustId/ios_trustid_781b2e99fe3a488eab858e05e4d48d63',
+                'referer': 'https://m.you.163.com/wishland',
+                'content-length': '9',
+                'Cookie':cookie
+            },
+            body: `buildId=${buildId}`,
+        }
+        $.post(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    console.log(data1.msg)
+                    if(data1.code==200){
+                        console.log("去建造")
+                        await $.wait(2000)
+                        await edit(cookie,buildId,position)
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function edit(cookie,buildId,position) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://m.you.163.com/act/napi/wishtown/building/edit.json`,
+            headers: {
+                "Content-Type":"application/json;charset=UTF-8",
+                'Cookie':cookie,
+            },
+            body: JSON.stringify({
+                "list": [{
+                    "buildId": buildId,
+                    "position": position
+                }]
+            }),
+        }
+        $.post(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    console.log(data1)
+                    if(data1.code==200){
+                        console.log("建造成功！")
                     }
                 }
             } catch (e) {
