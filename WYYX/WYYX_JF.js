@@ -17,6 +17,8 @@ let noticeBody = '';
             await getAwardNum(cookie);
             console.log("\n开始积分夺宝")
             await dbId(cookie);
+            console.log("\n开起宝箱")
+            await getBoxInfo(cookie);
             await getPoint(cookie,num);
             await $.wait(2000)
         }
@@ -282,6 +284,80 @@ function bet(cookie,id) {
                         console.log(data1.data.msg)
                     } else {
                         console.log("已投注")
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function getBoxInfo(cookie,num) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://act.you.163.com/napi/act/treasure/box/info?csrf_token=d8e45e3ead255360e64ab7744ffa9056&__timestamp=1668874604884&`,
+            headers: {
+                'Cookie':cookie,
+                'Host': 'act.you.163.com',
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Content-Type': 'application/json',
+                'Origin': 'https://act.you.163.com'
+            },
+        }
+        $.get(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    let id = data1.result.id;
+                    await open(cookie, id)
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function open(cookie,id) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://act.you.163.com/napi/act/treasure/box/open?csrf_token=d8e45e3ead255360e64ab7744ffa9056`,
+            headers: {
+                'Cookie':cookie,
+                'Host': 'act.you.163.com',
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Content-Type': 'application/json',
+                'Origin': 'https://act.you.163.com'
+            },
+            body:JSON.stringify({
+                "id": id
+            })
+        }
+        $.post(options, (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    if (data1.code == 200) {
+                        console.log(data1.result.prizeName)
+                    } else {
+                        console.log(data1.msg)
                     }
                 }
             } catch (e) {
