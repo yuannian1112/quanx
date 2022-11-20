@@ -152,6 +152,7 @@ function queryTown(cookie,taskId,title) {
                     for (let i = 0; i < downList.length; i++) {
                         let buildId = downList[i].buildId;
                         await collectCoin(cookie, buildId);
+                        await $.wait(2000)
                     }
                 }
             } catch (e) {
@@ -289,7 +290,7 @@ function edit(cookie,buildId,position) {
 function collectCoin(cookie,buildId) {
     return new Promise(resolve => {
         const options = {
-            url: `https://m.you.163.com/act/napi/wishtown/assets/collectCoin.json?csrf_token=365761ff59bfc2e276233dd9f7de0fa4`,
+            url: `https://m.you.163.com/act/napi/wishtown/assets/collectCoin.json?csrf_token=b1a1e14f2ef3204af3ae0a23bbc7554a`,
             headers: {
                 'Host': 'm.you.163.com',
                 'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -297,7 +298,7 @@ function collectCoin(cookie,buildId) {
                 'accept-language': 'zh-CN,zh-Hans;q=0.9',
                 'accept-encoding': 'gzip, deflate, br',
                 'origin': 'https://m.you.163.com',
-                'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 yanxuan/7.6.8 device-id/ed179fedbfda9a7c5c9d462616c7bd96 app-chan-id/AppStore trustId/ios_trustid_781b2e99fe3a488eab858e05e4d48d63',
+                'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.30(0x18001e29) NetType/WIFI Language/zh_CN',
                 'referer': 'https://m.you.163.com/wishland',
                 'content-length': '9',
                 'Cookie':cookie
@@ -406,6 +407,8 @@ function taskList(cookie) {
                         }
                         let title = tasks[i].title;
                         let coin = tasks[i].reward;
+                        await $.wait(2000)
+                        await reward(cookie, taskId,coin);
                         // if(taskId==316){
                         //     await doTask1(cookie, taskId, title);
                         //     await $.wait(2000)
@@ -474,7 +477,7 @@ function doTask1(cookie,taskId,title) {
                 'accept-language': 'zh-CN,zh-Hans;q=0.9',
                 'accept-encoding': 'gzip, deflate, br',
                 'origin': 'https://act.you.163.com',
-                'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 yanxuan/7.6.8 device-id/ed179fedbfda9a7c5c9d462616c7bd96 app-chan-id/AppStore trustId/ios_trustid_781b2e99fe3a488eab858e05e4d48d63',
+                //'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 yanxuan/7.6.8 device-id/ed179fedbfda9a7c5c9d462616c7bd96 app-chan-id/AppStore trustId/ios_trustid_781b2e99fe3a488eab858e05e4d48d63',
                 'referer': 'https://act.you.163.com/act/pub/ssr/yHp8vH6SGRbi.html?appConfig=1_1_1&award=2000&schemaId=15&taskId=316&taskType=2',
                 'content-length': '16',
                 'Cookie':cookie,
@@ -524,7 +527,15 @@ function reward(cookie,taskId,coin) {
                 } else {
                     let data1 = JSON.parse(data)
                     if (data1.code == 200) {
-                        console.log("获得金币"+coin)
+                        if(taskId==332){
+                            console.log("获得建造许可证1个")
+                        }else if(taskId==333){
+                            console.log("获得扩建许可证1个")
+                        } else{
+                            console.log("获得金币"+coin)
+                        }
+                    }else {
+                        console.log(data1.msg)
                     }
                 }
             } catch (e) {
