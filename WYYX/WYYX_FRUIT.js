@@ -22,13 +22,10 @@ let ckStr = ($.isNode() ? process.env.WYYXFRUIT : $.getdata("WYYXFRUIT")) || "";
             let num = index + 1;
             console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
             cookie = ckArr[index];
-            console.log("开始签到")
-            await checkIn(cookie);
-            await $.wait(2000)
             console.log("\n开始做任务")
             await taskList(cookie);
             await $.wait(2000)
-            await queryInfo(cookie);
+            await queryInfo(cookie,num);
         }
     }
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
@@ -51,7 +48,7 @@ function getCookie() {
     $.done({})
 }
 
-function queryInfo(cookie) {
+function queryInfo(cookie,num) {
     return new Promise(resolve => {
         const options = {
             url: `https://miniapp.you.163.com/orchard/game/water/index/dynamic.json`,
@@ -70,7 +67,8 @@ function queryInfo(cookie) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
-                    //console.log(data1)
+                    let desc = data1.result.levelDesc;
+                    $.msg($.name,`第${num}个账号`,`${desc}`)
                     let leftAmount = data1.result.leftAmount;
                     console.log("\n当前拥有水滴："+leftAmount)
                     console.log("开始浇水")
@@ -146,13 +144,33 @@ function taskList(cookie) {
                     for(let i in tasks) {
                         console.log("任务："+tasks[i].desc);
                         let taskRecordId = tasks[i].taskRecordId;
-                        if(i=="VISIT_ITEM"){
-                            await finish(cookie)
-                            //await visitItemList()
+                        if(i=="GARDEN_CHECK_IN_MUTUAL_GUIDE"){
+                            console.log("开始签到")
                             await $.wait(1000)
+                            await checkIn(cookie);
                         }
-                        await get(cookie,i,taskRecordId);
-                        await $.wait(2000)
+                        if(i=="NOTIFY_TOMORROW"){
+                            await $.wait(1000)
+                            await subscribe(cookie)
+                        }
+                        if(i=="VISIT_ITEM"){
+                            await $.wait(1000)
+                            await finish(cookie)
+                        }
+                        if(taskRecordId==0||taskRecordId==undefined){
+                            if(i=="GET_EVERYDAY_FREE"){
+                                let url=`https://miniapp.you.163.com/orchard/task/water/get.json?taskId=${i}`
+                                await get(cookie,url);
+                                await $.wait(30000)
+                            }
+                            await $.wait(2000)
+                            let url=`https://miniapp.you.163.com/orchard/task/water/get.json?taskId=${i}`
+                            await get(cookie,url);
+                        }else {
+                            await $.wait(2000)
+                            let url=`https://miniapp.you.163.com/orchard/task/water/get.json?taskId=${i}&taskRecordId=${taskRecordId}&subTaskId=`
+                            await get(cookie,url);
+                        }
                     }
                 }
             } catch (e) {
@@ -164,10 +182,10 @@ function taskList(cookie) {
     })
 }
 
-function visitItemList(cookie) {
+function subscribe(cookie) {
     return new Promise(resolve => {
         const options = {
-            url: `https://miniapp.you.163.com/xhr/rcmd/indexV2.json?scene=1&type=0&size=20&lastItemId=0&categoryId=0`,
+            url: `https://miniapp.you.163.com/act/utils/message/subscribe/add.json?module=orchardUserNotice`,
             headers: {
                 'Host': 'miniapp.you.163.com',
                 'Connection': 'keep-alive',
@@ -183,44 +201,7 @@ function visitItemList(cookie) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
-                    let ItemList = data1.data.rcmdItemList;
-                    for (let i = 0; i < ItemList.length; i++) {
-                        if(ItemList[i].categoryItem){
-                            let itemId = ItemList[i].categoryItem.id;
-                                await visitItem(cookie,itemId)
-                        }
-                    }
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve();
-            }
-        })
-    })
-}
-
-function visitItem(cookie,itemId) {
-    return new Promise(resolve => {
-        const options = {
-            //url: `https://miniapp.you.163.com/xhr/item/getFloatRes.json?itemId=${itemId}`,
-            url: `https://miniapp.you.163.com/orchard/task/visitItem.json?itemId=${itemId}`,
-            headers: {
-                'Host': 'miniapp.you.163.com',
-                'Connection': 'keep-alive',
-                'X-WX-3RD-Session': cookie,
-                'content-type': 'application/json',
-                'Referer': 'https://servicewechat.com/wx5b768b801d27f022/469/page-frame.html'
-            }
-        }
-        $.get(options, async (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
-                } else {
-                    let data1 = JSON.parse(data)
-                    console.log(data1)
+                    //console.log(data1)
                 }
             } catch (e) {
                 $.logErr(e, resp)
@@ -263,10 +244,10 @@ function finish(cookie) {
     })
 }
 
-function get(cookie,taskId,taskRecordId) {
+function get(cookie,url) {
     return new Promise(resolve => {
         const options = {
-            url: `https://miniapp.you.163.com/orchard/task/water/get.json?taskId=${taskId}&taskRecordId=${taskRecordId}&subTaskId=`,
+            url: url,
             headers: {
                 'Host': 'miniapp.you.163.com',
                 'Connection': 'keep-alive',
