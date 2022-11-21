@@ -67,9 +67,12 @@ function list(cookie,num) {
                             await sign(cookie, title);
                             await $.wait(2000)
                             await reward(cookie, taskId);
+                            await $.wait(2000)
                         } else {
                             await $.wait(2000)
                             await doTask(cookie, taskId, title);
+                            await $.wait(2000)
+                            await reward(cookie, taskId);
                         }
                     }
                 }
