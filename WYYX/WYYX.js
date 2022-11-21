@@ -21,9 +21,13 @@ let noticeBody = '';
         let ckArr = await Variable_Check(ckStr, "WYYX");
         for (let index = 0; index < ckArr.length; index++) {
             let num = index + 1;
+            $.isLogin = true;
             console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
             cookie = ckArr[index];
-            await  sign(cookie);
+            await  sign(cookie,num);
+            if (!$.isLogin) {
+                continue
+            }
             await query(cookie,num);
             await $.wait(2000)
         }
@@ -68,14 +72,16 @@ function query(cookie,num) {
             },
             body:JSON.stringify({"schemaId":21})
         }
-        $.post(options, (err, resp, data) => {
+        $.post(options, async (err, resp, data) => {
             try {
                 if (err) {
                     console.log(`${JSON.stringify(err)}`)
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
-                    $.msg($.name,`第${num}个账号 ${noticeBody}`,`签到情况：已签${data1.result.userTask.taskCurrValue}/${data1.result.userTask.taskTargetValue}天`)
+                    let taskCurrValue = data1.result.userTask.taskCurrValue;
+                    let taskTargetValue = data1.result.userTask.taskTargetValue;
+                    await getYouUserInfo(cookie,num,taskCurrValue,taskTargetValue)
                 }
             } catch (e) {
                 $.logErr(e, resp)
@@ -86,7 +92,7 @@ function query(cookie,num) {
     })
 }
 
-function sign(cookie) {
+function sign(cookie,num) {
     return new Promise(resolve => {
         const options = {
             url: `https://act.you.163.com/act/napi/play/web/activation/sign/try.json?csrf_token=a23fca337d71ddfec2948ea53dd49d38`,
@@ -108,8 +114,46 @@ function sign(cookie) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
+                    if(data1.code==401){
+                        $.isLogin = false;
+                        $.msg($.name + `第${num}个账号：ck已过期，请重新获取`);
+                        return
+                    }
                     console.log(data1.msg)
                     noticeBody = data1.msg
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function getYouUserInfo(cookie,num,taskCurrValue,taskTargetValue) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://act.you.163.com/napi/yxcommon/ajax/getYouUserInfo.do?csrf_token=2e92d3145410ea8af714b74acb204783&__timestamp=1669032249164&`,
+            headers: {
+                'Cookie':cookie,
+                'Host': 'act.you.163.com',
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Content-Type': 'application/json',
+                'Origin': 'https://act.you.163.com'
+            },
+        }
+        $.post(options, (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    $.msg($.name, `第${num}个账号 ${noticeBody}`, `签到情况：已签${taskCurrValue}/${taskTargetValue}天`)
                 }
             } catch (e) {
                 $.logErr(e, resp)

@@ -9,11 +9,14 @@ let codeStr;
     let ckArr = await Variable_Check(ckStr, "WYYX");
     for (let index = 0; index < ckArr.length; index++) {
         let num = index + 1;
+        $.isLogin = true;
         console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
         cookie = ckArr[index];
         await queryInfo(cookie,num);
+        if (!$.isLogin) {
+            continue
+        }
         await $.wait(2000)
-        console.log("\n拥有建筑：")
         await queryTown(cookie);
         await $.wait(2000)
         console.log("\n未建造建筑：")
@@ -28,11 +31,15 @@ let codeStr;
     let codeArr = await Variable_Check(codeStr, "WYYXCODE");
     for (let index = 0; index < ckArr.length; index++) {
         let num = index + 1;
+        $.isLogin = true;
         console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
         cookie = ckArr[index];
         for (let index1 = 0; index1 < codeArr.length; index1++) {
             code = codeArr[index1];
             await help(cookie, code);
+            if (!$.isLogin) {
+                continue
+            }
             await $.wait(2000)
         }
     }
@@ -65,6 +72,11 @@ function queryInfo(cookie,num) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
+                    if(data1.code==401){
+                        $.isLogin = false;
+                        $.msg($.name + `第${num}个账号：ck已过期，请重新获取`);
+                        return
+                    }
                     for (let i=0;i<data1.result.length;i++) {
                         if (data1.result[i].level!=null) {
                             let count = data1.result[i].count;
@@ -79,7 +91,7 @@ function queryInfo(cookie,num) {
                         if (data1.result[i].type==3) {
                             let count = data1.result[i].count;
                             console.log("拥有钻石："+count)
-                            $.msg($.name,`第${num}个账号`,`拥有钻石：${count}`)
+                            await getYouUserInfo(cookie,num,count)
                         }
                         if (data1.result[i].type==4) {
                             let count = data1.result[i].count;
@@ -126,9 +138,10 @@ function queryTown(cookie,taskId,title) {
                     let data1 = JSON.parse(data)
                     let downList = data1.result.buildings;
                     if(downList.length<7 && $.totalBuild<1 && $.totalCoin>500000){
-                        console.log("去购买建造许可证")
-                        //await buyCard(cookie)
+                        console.log("\n去购买建造许可证")
+                        await buyCard(cookie,"1")
                     }
+                    console.log("\n拥有建筑：")
                     for (let i = 0; i < downList.length; i++) {
                         let downName = downList[i].buildName;
                         let downLevel = downList[i].level;
@@ -148,18 +161,60 @@ function queryTown(cookie,taskId,title) {
                             console.log("开始升级")
                             await upgrade(cookie,buildId);
                         }
-                        if (buildId!=1&&downLevel<=10){
+                        if (buildId!=1&&downLevel<10){
                             console.log("开始升级")
-                            await upgrade(cookie,buildId);
+                            for (let j = 0; j < 10-downLevel; j++) {
+                                await $.wait(2000)
+                                await upgrade(cookie,buildId);
+                            }
                         }
                     }
                     console.log("\n开始收集金币")
-                    await $.wait(2000)
                     for (let i = 0; i < downList.length; i++) {
                         let buildId = downList[i].buildId;
                         await collectCoin(cookie, buildId);
                         await $.wait(2000)
                     }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function buyCard(cookie,materialId) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://m.you.163.com/act/napi/wishtown/material/change.json`,
+            headers: {
+                'Cookie':cookie,
+                'Host': 'm.you.163.com',
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Content-Type': 'application/json',
+                'referer': 'https://m.you.163.com/wishland'
+            },
+            body:JSON.stringify(
+                {
+                    "materialId": materialId,
+                    "num": 1
+                }
+            )
+        }
+        $.post(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    console.log(data1.msg)
+                    $.totalBuild+=1
                 }
             } catch (e) {
                 $.logErr(e, resp)
@@ -283,7 +338,6 @@ function edit(cookie,buildId,position) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
-                    console.log(data1)
                     if(data1.code==200){
                         console.log("建造成功！")
                     }
@@ -574,7 +628,44 @@ function help(cookie,code) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
+                    if(data1.code==401){
+                        $.isLogin = false;
+                        return
+                    }
                     console.log(data1.msg)
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function getYouUserInfo(cookie,num,count) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://act.you.163.com/napi/yxcommon/ajax/getYouUserInfo.do?csrf_token=2e92d3145410ea8af714b74acb204783&__timestamp=1669032249164&`,
+            headers: {
+                'Cookie':cookie,
+                'Host': 'act.you.163.com',
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Content-Type': 'application/json',
+                'Origin': 'https://act.you.163.com'
+            },
+        }
+        $.post(options, (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    $.msg($.name,`第${num}个账号：${data1.content.nickName}`,`拥有钻石：${count}`)
                 }
             } catch (e) {
                 $.logErr(e, resp)

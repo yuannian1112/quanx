@@ -4,7 +4,6 @@
 */
 const $ = new Env('网易严选-积分');
 let ckStr = ($.isNode() ? process.env.WYYX : $.getdata("WYYX")) || "";
-let noticeBody = '';
 !(async () => {
         let ckArr = await Variable_Check(ckStr, "WYYX");
         for (let index = 0; index < ckArr.length; index++) {
@@ -12,7 +11,10 @@ let noticeBody = '';
             console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
             cookie = ckArr[index];
             console.log("\n开始做任务")
-            await list(cookie);
+            await list(cookie,num);
+            if (!$.isLogin) {
+                continue
+            }
             console.log("\n开始拆礼盒")
             await getAwardNum(cookie);
             console.log("\n开始积分夺宝")
@@ -24,7 +26,7 @@ let noticeBody = '';
         }
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
 
-function list(cookie) {
+function list(cookie,num) {
     return new Promise(resolve => {
         const options = {
             url: `https://act.you.163.com/act-attendance/task/list?csrf_token=8c42ce89c70d294a0097db0811038d3c&__timestamp=1668774822000&`,
@@ -50,16 +52,59 @@ function list(cookie) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
+                    if(data1.code==401){
+                        $.isLogin = false;
+                        $.msg($.name + `第${num}个账号：ck已过期，请重新获取`);
+                        return
+                    }
                     let tasks = data1.data.dailyTasks;
                     //console.log(tasks)
                     for (let i = 0; i < tasks.length; i++) {
                         let taskId = tasks[i].taskId;
                         let title = tasks[i].title;
-                        await doTask(cookie, taskId, title);
-                        await $.wait(2000)
-                        await reward(cookie, taskId);
-                        await $.wait(2000)
+                        if(taskId==201001){
+                            await sign(cookie, title);
+                            await $.wait(2000)
+                            await reward(cookie, taskId);
+                        } else {
+                            await $.wait(2000)
+                            await doTask(cookie, taskId, title);
+                        }
                     }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function sign(cookie,title) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://act.you.163.com/act-attendance/att/v3/sign?csrf_token=68d6f25101f558f1e1f97583d199e992&__timestamp=1669036047136&`,
+            headers: {
+                'Cookie':cookie,
+                'Host': 'act.you.163.com',
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Content-Type': 'application/json',
+                'Origin': 'https://act.you.163.com'
+            },
+        }
+        $.get(options, (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    console.log("开始任务："+title)
+                    console.log(data1.msg)
                 }
             } catch (e) {
                 $.logErr(e, resp)
@@ -73,7 +118,7 @@ function list(cookie) {
 function doTask(cookie,taskId,title) {
     return new Promise(resolve => {
         const options = {
-            url: `https://act.you.163.com/napi/play/web/taskT/task/trigger?_=1668774872206`,
+            url: `https://act.you.163.com/napi/play/web/taskT/task/trigger?_=${new Date().getTime()}`,
             headers: {
                 'Cookie':cookie,
                 'Host': 'act.you.163.com',
@@ -270,7 +315,7 @@ function bet(cookie,id) {
             body: JSON.stringify({
                 "skuId": id,
                 "points": 1,
-                "date": await getNowFormatDate()
+                "date": getNowFormatDate()
             }),
         }
         $.post(options, (err, resp, data) => {
@@ -384,7 +429,7 @@ function getPoint(cookie,num) {
                 'Origin': 'https://m.you.163.com'
             },
         }
-        $.post(options, (err, resp, data) => {
+        $.post(options, async (err, resp, data) => {
             try {
                 if (err) {
                     console.log(`${JSON.stringify(err)}`)
@@ -392,8 +437,41 @@ function getPoint(cookie,num) {
                 } else {
                     let data1 = JSON.parse(data)
                     let jf = data1.data.availablePoint;
-                    console.log("\n我的积分："+jf)
-                    $.msg($.name,`第${num}个账号`,`我的积分：${jf}`)
+                    console.log("\n我的积分：" + jf)
+                    await getYouUserInfo(cookie, num,jf)
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function getYouUserInfo(cookie,num,jf) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://act.you.163.com/napi/yxcommon/ajax/getYouUserInfo.do?csrf_token=2e92d3145410ea8af714b74acb204783&__timestamp=1669032249164&`,
+            headers: {
+                'Cookie':cookie,
+                'Host': 'act.you.163.com',
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Content-Type': 'application/json',
+                'Origin': 'https://act.you.163.com'
+            },
+        }
+        $.post(options, (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    $.msg($.name,`第${num}个账号：${data1.content.nickName}`,`我的积分：${jf}`)
                 }
             } catch (e) {
                 $.logErr(e, resp)

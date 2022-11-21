@@ -20,10 +20,14 @@ let ckStr = ($.isNode() ? process.env.WYYXFRUIT : $.getdata("WYYXFRUIT")) || "";
         let ckArr = await Variable_Check(ckStr, "WYYXFRUIT");
         for (let index = 0; index < ckArr.length; index++) {
             let num = index + 1;
+            $.isLogin = true;
             console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
             cookie = ckArr[index];
             console.log("\n开始做任务")
-            await taskList(cookie);
+            await taskList(cookie,num);
+            if (!$.isLogin) {
+                continue
+            }
             await $.wait(2000)
             await queryInfo(cookie,num);
         }
@@ -121,7 +125,7 @@ function checkIn(cookie) {
     })
 }
 
-function taskList(cookie) {
+function taskList(cookie,num) {
     return new Promise(resolve => {
         const options = {
             url: `https://miniapp.you.163.com/orchard/task/list.json?taskIdList=%5B%22FRIEND_HELP%22%2C%22VISIT_ITEM%22%2C%22PAY_ITEM%22%2C%22GET_EVERYDAY_RANDOM%22%2C%22NOTIFY_TOMORROW%22%2C%22GET_EVERYDAY_FREE%22%2C%22PAY_SUPER_MC%22%2C%22FINISH_PIN%22%2C%22DROP_WATER_CONTINUOUS%22%2C%22VISIT_PAGE%22%2C%22GARDEN_CHECK_IN_MUTUAL_GUIDE%22%5D`,
@@ -140,6 +144,11 @@ function taskList(cookie) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
+                    if(data1.code==401){
+                        $.isLogin = false;
+                        $.msg($.name + `第${num}个账号：ck已过期，请重新获取`);
+                        return
+                    }
                     let tasks = data1.result;
                     for(let i in tasks) {
                         console.log("任务："+tasks[i].desc);
