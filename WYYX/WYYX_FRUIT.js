@@ -2,7 +2,7 @@
 活动入口：网易严选微信小程序-个人-免费领水果
 打开个人-免费领水果-浇水获取ck
 [task_local]
-22 8,13,19 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX_FRUIT.js, tag=网易严选-小程序-免费领水果, enabled=true
+22 8,13,19 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX_FRUIT.js, tag=网易严选-小程序-免费领水果, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/yanxuan.png, enabled=true
 [MITM]
 hostname = miniapp.you.163.com
 

@@ -2,7 +2,7 @@
 打开个人-积分-获取ck
 活动入口：网易严选app-个人-领鸡蛋
 [task_local]
-2 0,23 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX.js, tag=网易严选-领鸡蛋, enabled=true
+2 0,23 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX.js, tag=网易严选-领鸡蛋, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/yanxuan.png, enabled=true
 [MITM]
 hostname = m.you.163.com
 
