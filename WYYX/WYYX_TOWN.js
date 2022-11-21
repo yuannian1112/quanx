@@ -13,11 +13,11 @@ let codeStr;
         cookie = ckArr[index];
         await queryInfo(cookie,num);
         await $.wait(2000)
-        console.log("\n未建造建筑：")
-        await buildList(cookie);
-        await $.wait(2000)
         console.log("\n拥有建筑：")
         await queryTown(cookie);
+        await $.wait(2000)
+        console.log("\n未建造建筑：")
+        await buildList(cookie);
         await $.wait(2000)
         console.log("\n开始做任务")
         await taskList(cookie);
@@ -73,6 +73,7 @@ function queryInfo(cookie,num) {
                         }
                         if (data1.result[i].type==1) {
                             let count = data1.result[i].count;
+                            $.totalCoin = count;
                             console.log("拥有金币："+count)
                         }
                         if (data1.result[i].type==3) {
@@ -82,10 +83,12 @@ function queryInfo(cookie,num) {
                         }
                         if (data1.result[i].type==4) {
                             let count = data1.result[i].count;
+                            $.totalBuild = count;
                             console.log("拥有建筑许可证："+count)
                         }
                         if (data1.result[i].type==5) {
                             let count = data1.result[i].count;
+                            $.totalExtend = count;
                             console.log("拥有扩建许可证："+count)
                         }
                     }
@@ -121,8 +124,11 @@ function queryTown(cookie,taskId,title) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
-                    //console.log(data1.result.buildings)
                     let downList = data1.result.buildings;
+                    if(downList.length<7 && $.totalBuild<1 && $.totalCoin>500000){
+                        console.log("去购买建造许可证")
+                        //await buyCard(cookie)
+                    }
                     for (let i = 0; i < downList.length; i++) {
                         let downName = downList[i].buildName;
                         let downLevel = downList[i].level;
@@ -138,7 +144,7 @@ function queryTown(cookie,taskId,title) {
                             console.log("升级需要：" + "金币：" + price)
                         }
                         await $.wait(2000)
-                        if (buildId==1){
+                        if (buildId==1 && downList.length==7){
                             console.log("开始升级")
                             await upgrade(cookie,buildId);
                         }
@@ -195,9 +201,13 @@ function buildList(cookie,taskId,title) {
                             let position = downList[i].position;
                             console.log("建筑："+buildName)
                             console.log("建造需要：金币："+buyingPrice+"建筑许可证：1个")
-                            console.log("去购买")
-                            await $.wait(2000)
-                            await buy(cookie,buildId,position)
+                            if ($.totalCoin>buyingPrice && $.totalBuild>0) {
+                                console.log("去购买建筑")
+                                await $.wait(2000)
+                                await buy(cookie,buildId,position)
+                            } else {
+                                console.log("原材料不足！")
+                            }
                         }
                     }
                 }
