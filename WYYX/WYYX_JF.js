@@ -8,6 +8,7 @@ let ckStr = ($.isNode() ? process.env.WYYX : $.getdata("WYYX")) || "";
         let ckArr = await Variable_Check(ckStr, "WYYX");
         for (let index = 0; index < ckArr.length; index++) {
             let num = index + 1;
+            $.isLogin = true;
             console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
             cookie = ckArr[index];
             console.log("\n开始做任务")
