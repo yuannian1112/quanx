@@ -141,6 +141,10 @@ function queryTown(cookie,taskId,title) {
                         console.log("\n去购买建造许可证")
                         await buyCard(cookie,"1")
                     }
+                    if(downList.length==7 && $.totalExtend<1 && $.totalCoin>200000){
+                        console.log("\n去购买扩建许可证")
+                        await buyCard(cookie,"2")
+                    }
                     console.log("\n拥有建筑：")
                     for (let i = 0; i < downList.length; i++) {
                         let downName = downList[i].buildName;
@@ -153,19 +157,25 @@ function queryTown(cookie,taskId,title) {
                             let materialName = upgradeRequire.userMaterialDTOList[0].materialName;
                             let count = upgradeRequire.userMaterialDTOList[0].upgradeCount;
                             console.log("升级需要：金币：" + price + " " + materialName + "：" + count + "个")
-                        } else {
-                            console.log("升级需要：" + "金币：" + price)
-                        }
-                        await $.wait(2000)
-                        if (buildId==1 && downList.length==7){
-                            console.log("开始升级")
-                            await upgrade(cookie,buildId);
-                        }
-                        if (buildId!=1&&downLevel<10){
-                            console.log("开始升级")
-                            for (let j = 0; j < 10-downLevel; j++) {
+                            await $.wait(2000)
+                            if (buildId==1 && downList.length==7 && downLevel<4 && $.totalExtend>0){
+                                console.log("开始升级")
+                                await upgrade(cookie,buildId);
+                            }
+                            if (buildId!=1 && $.totalExtend>0){
+                                console.log("开始升级")
                                 await $.wait(2000)
                                 await upgrade(cookie,buildId);
+                            }
+                        } else {
+                            console.log("升级需要：" + "金币：" + price)
+                            await $.wait(2000)
+                            if (buildId!=1&&downLevel<10){
+                                console.log("开始升级")
+                                for (let j = 0; j < 10-downLevel; j++) {
+                                    await $.wait(2000)
+                                    await upgrade(cookie,buildId);
+                                }
                             }
                         }
                     }
@@ -214,7 +224,11 @@ function buyCard(cookie,materialId) {
                 } else {
                     let data1 = JSON.parse(data)
                     console.log(data1.msg)
-                    $.totalBuild+=1
+                    if(materialId==1){
+                        $.totalBuild+=1
+                    } else {
+                        $.totalExtend+=1
+                    }
                 }
             } catch (e) {
                 $.logErr(e, resp)
