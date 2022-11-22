@@ -46,6 +46,13 @@ hostname = miniapp.you.163.com
 ```
 20 0-23/3 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX_TOWN.js, tag=网易严选-严选家园, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/yanxuan.png, enabled=true
 ```
+#### 活动名：网易严选-水晶兑换
+活动入口：网易严选app-个人-严选家园-水晶兑换
+
+[task_local]
+```
+1 0 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/WYYX/WYYX_TOWN_EXCHANGE.js, tag=网易严选-水晶兑换, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/yanxuan.png, enabled=true
+```
 #### 活动名：免费领水果
 活动入口：网易严选微信小程序-个人-免费领水果
 

@@ -151,9 +151,6 @@ function queryTown(cookie,taskId,title) {
                         let downLevel = downList[i].level;
                         let buildId = downList[i].buildId;
                         console.log("建筑：" + downName + " 当前等级：" + downLevel)
-                        if(buildId==1){
-                            await furnitureList(cookie,downList.length)
-                        }
                         let upgradeRequire = downList[i].upgradeRequire;
                         let price = upgradeRequire.price;
                         if (upgradeRequire.userMaterialDTOList != null) {
@@ -180,6 +177,9 @@ function queryTown(cookie,taskId,title) {
                                     await upgrade(cookie,buildId);
                                 }
                             }
+                        }
+                        if(buildId==1){
+                            await furnitureList(cookie,downList.length)
                         }
                     }
                     console.log("\n开始收集金币")
