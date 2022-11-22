@@ -18,7 +18,7 @@ let type = ($.isNode() ? process.env.WYYXTYPE : $.getdata("WYYXTYPE")) || "";
         await list(cookie);
         console.log("\n兑换商品")
         if(id==0 ||type==0){
-            console.log("请在boxjs填写要兑换的商品id和type")
+            $.msg("请在boxjs填写要兑换的商品id和type")
             continue
         }
         await exchangePoints(cookie,id,type,num)
