@@ -141,7 +141,7 @@ function queryTown(cookie,taskId,title) {
                         console.log("\n去购买建造许可证")
                         await buyCard(cookie,"1")
                     }
-                    if(downList.length==7 && $.totalExtend<1 && $.totalCoin>200000){
+                    if(downList.length==7 && $.totalExtend<1 && $.totalCoin>100000){
                         console.log("\n去购买扩建许可证")
                         await buyCard(cookie,"2")
                     }
@@ -158,7 +158,7 @@ function queryTown(cookie,taskId,title) {
                             let count = upgradeRequire.userMaterialDTOList[0].upgradeCount;
                             console.log("升级需要：金币：" + price + " " + materialName + "：" + count + "个")
                             await $.wait(2000)
-                            if (buildId==1 && downList.length==7 && downLevel<4 && $.totalExtend>0){
+                            if (buildId==1 && downList.length==7 && downLevel<3 && $.totalExtend>0){
                                 console.log("开始升级")
                                 await upgrade(cookie,buildId);
                             }
