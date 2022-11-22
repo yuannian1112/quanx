@@ -151,6 +151,9 @@ function queryTown(cookie,taskId,title) {
                         let downLevel = downList[i].level;
                         let buildId = downList[i].buildId;
                         console.log("建筑：" + downName + " 当前等级：" + downLevel)
+                        if(buildId==1){
+                            await furnitureList(cookie,downList.length)
+                        }
                         let upgradeRequire = downList[i].upgradeRequire;
                         let price = upgradeRequire.price;
                         if (upgradeRequire.userMaterialDTOList != null) {
@@ -239,7 +242,7 @@ function buyCard(cookie,materialId) {
     })
 }
 
-function buildList(cookie,taskId,title) {
+function buildList(cookie) {
     return new Promise(resolve => {
         const options = {
             url: `https://m.you.163.com/act/napi/wishtown/building/list.json?__timestamp=1668865533554&`,
@@ -274,8 +277,6 @@ function buildList(cookie,taskId,title) {
                                 console.log("去购买建筑")
                                 await $.wait(2000)
                                 await buy(cookie,buildId,position)
-                            } else {
-                                console.log("原材料不足！")
                             }
                         }
                     }
@@ -354,6 +355,138 @@ function edit(cookie,buildId,position) {
                     let data1 = JSON.parse(data)
                     if(data1.code==200){
                         console.log("建造成功！")
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function furnitureList(cookie,length) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://m.you.163.com/act/napi/wishtown/furniture/list.json?csrf_token=39e204ce1d717677e66e52687b8c6d75&__timestamp=1669094390944&`,
+            headers: {
+                'Cookie':cookie,
+                'Host': 'm.you.163.com',
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Content-Type': 'application/json',
+                'referer': 'https://m.you.163.com/wishland'
+            }
+        }
+        $.get(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    let downList = data1.result;
+                    console.log("拥有装饰：")
+                    for (let j = 0; j < downList.length; j++) {
+                        if (downList[j].status==2){
+                            let buildName = downList[j].name;
+                            console.log("装饰："+buildName)
+                        }
+                    }
+                    console.log("未拥有装饰：")
+                    for (let i = 0; i < downList.length; i++) {
+                        if (downList[i].status==0){
+                            let buildName = downList[i].name;
+                            let buyingPrice = downList[i].price;
+                            let furnId = downList[i].furnId;
+                            let position = downList[i].position;
+                            console.log("装饰："+buildName)
+                            console.log("需要：金币："+buyingPrice)
+                            if ($.totalCoin>buyingPrice && length==7) {
+                                console.log("去购买装饰")
+                                await $.wait(2000)
+                                await furnitureBuy(cookie,furnId,position)
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function furnitureBuy(cookie,furnId,position) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://m.you.163.com/act/napi/wishtown/furniture/buy.json?csrf_token=39e204ce1d717677e66e52687b8c6d75`,
+            headers: {
+                'Host': 'm.you.163.com',
+                'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'accept': 'application/json, text/javascript, */*; q=0.01',
+                'accept-language': 'zh-CN,zh-Hans;q=0.9',
+                'accept-encoding': 'gzip, deflate, br',
+                'origin': 'https://m.you.163.com',
+                'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 yanxuan/7.6.8 device-id/ed179fedbfda9a7c5c9d462616c7bd96 app-chan-id/AppStore trustId/ios_trustid_781b2e99fe3a488eab858e05e4d48d63',
+                'referer': 'https://m.you.163.com/wishland',
+                'content-length': '8',
+                'Cookie':cookie
+            },
+            body: `furnId=${furnId}`,
+        }
+        $.post(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    console.log(data1.msg)
+                    if(data1.code==200){
+                        console.log("去装饰")
+                        await $.wait(2000)
+                        await furnitureEdit(cookie,furnId,position)
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function furnitureEdit(cookie,furnId,position) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://m.you.163.com/act/napi/wishtown/furniture/edit.json?csrf_token=39e204ce1d717677e66e52687b8c6d75`,
+            headers: {
+                "Content-Type":"application/json;charset=UTF-8",
+                'Cookie':cookie,
+            },
+            body: JSON.stringify({
+                "list": [{
+                    "furnId": furnId,
+                    "position": position
+                }]
+            }),
+        }
+        $.post(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    if(data1.code==200){
+                        console.log("布置成功！")
                     }
                 }
             } catch (e) {
