@@ -70,6 +70,8 @@ function list(cookie,num) {
                         } else {
                             await $.wait(2000)
                             await doTask(cookie, taskId, title);
+                            await $.wait(2000)
+                            await reward(cookie, taskId);
                         }
                     }
                 }
