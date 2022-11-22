@@ -177,6 +177,10 @@ function queryTown(cookie,taskId,title) {
                                     await upgrade(cookie,buildId);
                                 }
                             }
+                            if (buildId!=1&&downList.length==7){
+                                console.log("开始升级")
+                                await upgrade(cookie,buildId);
+                            }
                         }
                         if(buildId==1){
                             await furnitureList(cookie,downList.length)
