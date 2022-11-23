@@ -1,3 +1,4 @@
+## quanx surge loon stash 脚本
 ### Script Overview
 
 |                   Application                   |                                           Script name                                           |   Available   | Maintenance |
@@ -12,3 +13,4 @@
 |                      小米运动                       |            [XmSport.js](https://github.com/xzxxn777/quanx/blob/main/XmSport/XmSport.js)            | ✅(2022/11/23) |      ✅️      |
 
 ------
+### [点击直达频道](https://t.me/xzxxn777)
