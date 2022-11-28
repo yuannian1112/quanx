@@ -109,6 +109,7 @@ function getMyReceiveRed(phone,phoneNum) {
                         await receiveRedPackage(phone,seqid)
                     }
                     Notice($.name,`用户${phoneNum}`,"红包："+body1);
+                    body1 = "";
                 } else {
                     $.log(data.msg)
                 }
