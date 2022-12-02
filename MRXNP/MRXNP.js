@@ -69,9 +69,7 @@ function list(cookie) {
                 } else {
                     let data1 = JSON.parse(data)
                     let address = data1.data.list[0].id;
-                    for (let i = 0; i < 3; i++) {
-                        await exchange(cookie, address);
-                    }
+                    await getTodayLuckyGoods(cookie,address);
                 }
             } catch (e) {
                 $.logErr(e, resp)
@@ -82,7 +80,45 @@ function list(cookie) {
     })
 }
 
-function exchange(cookie,address) {
+function getTodayLuckyGoods(cookie,address) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://timingmilk.timingmar.com/applet/mc/lucky/goods/user/getTodayLuckyGoods`,
+            headers: {
+                "Host": "timingmilk.timingmar.com",
+                "Accept": "application/json, text/plain, */*",
+                "Accept-Encoding": "gzip, deflate",
+                "User-Agent": 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36 MicroMessenger/7.0.4.501 NetType/WIFI MiniProgramEnv/Windows WindowsWechat/WMPF',
+                "Accept-Language": "en-us,en",
+                "Referer": "https://servicewechat.com/wx22e71861f072baf5/2/page-frame.html",
+                "Content-Type": "application/json",
+                "access_token": cookie,
+            },
+        }
+        $.get(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                }
+                else {
+                    let data1 = JSON.parse(data)
+                    let id = data1.data.id;
+                    let time = data1.data.openTime;
+                    $.msg($.name,"下场秒杀时："+new Date(time).toLocaleString(),"请手动更改定时！");
+                    for (let i = 0; i < 3; i++) {
+                        await exchange(cookie, address, id);
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+function exchange(cookie,address,id) {
     return new Promise(resolve => {
         const options = {
             url: `https://timingmilk.timingmar.com/applet/mc/lucky/goods/user/submit/order`,
@@ -96,7 +132,7 @@ function exchange(cookie,address) {
                 "Content-Type": "application/json",
                 "access_token": cookie,
             },
-            body:JSON.stringify({"luckyGoodsId":"1","quantity":"1","euCouponId":null,"totalPayFee":"0.99","loader":true,"remarks":"","addressId":`${address}`,"statusNow":2})
+            body:JSON.stringify({"luckyGoodsId":`${id}`,"quantity":"1","euCouponId":null,"totalPayFee":"0.99","loader":true,"remarks":"","addressId":`${address}`,"statusNow":2})
         }
         $.post(options, async (err, resp, data) => {
             try {

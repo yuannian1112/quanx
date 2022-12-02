@@ -103,6 +103,8 @@ function getTodayLuckyGoods(cookie,address) {
                 } else {
                     let data1 = JSON.parse(data)
                     let id = data1.data.id;
+                    let time = data1.data.openTime;
+                    $.msg($.name,"下场秒杀时："+new Date(time).toLocaleString(),"请手动更改定时！");
                     for (let i = 0; i < 3; i++) {
                         await exchange(cookie, address, id);
                     }
