@@ -27,7 +27,7 @@ let codeStr;
         await $.wait(2000)
     }
     console.log("\n开始助力")
-    codeStr = ($.isNode() ? process.env.WYYXCODE : $.getdata("WYYXCODE")) || "";
+    codeStr = $.getdata("WYYXCODE") || "";
     let codeArr = await Variable_Check(codeStr, "WYYXCODE");
     for (let index = 0; index < ckArr.length; index++) {
         let num = index + 1;
@@ -607,7 +607,7 @@ function taskList(cookie) {
                         let taskId = tasks[i].taskId;
                         if(taskId==333){
                             let code=tasks[i].redirectUrl.match(/sk=([^& ]+)/)[1];
-                            codeStr = ($.isNode() ? process.env.WYYXCODE : $.getdata("WYYXCODE")) || "";
+                            codeStr = $.getdata("WYYXCODE") || "";
                             if (codeStr) {
                                 if (codeStr.indexOf(code) == -1) { // 找不到返回 -1
                                     codeStr = codeStr + "?" + code;

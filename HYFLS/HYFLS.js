@@ -1,50 +1,18 @@
 /*
-打开我的-收货地址-获取ck(不行就退出微信重新进)
-活动入口：微信小程序-汇源福利社
-必须填一个地址
 [task_local]
-0 15 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/HYFLS/HYFLS.js, tag=汇源福利社, enabled=true
-[MITM]
-hostname = huiyuan.timingmar.com
-[rewrite_local]
-# 汇源福利社获取cookie
-^https:\/\/huiyuan\.timingmar\.com\/hy-api\/mc\/eu\/address\/list url script-request-header https://raw.githubusercontent.com/xzxxn777/quanx/main/HYFLS/HYFLS.js
-
+0 15 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/HYFLS/HYFLS.js, tag=汇源福利社-秒杀, enabled=true
 */
-const $ = new Env('汇源福利社');
-const isRequest = typeof $request != "undefined"
+const $ = new Env('汇源福利社-秒杀');
 let ckStr = ($.isNode() ? process.env.HYFLS : $.getdata("HYFLS")) || "";
 !(async () => {
-    if (isRequest) {
-        await getCookie();
-    } else {
-        let ckArr = await Variable_Check(ckStr, "HYFLS");
-        for (let index = 0; index < ckArr.length; index++) {
-            let num = index + 1;
-            console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
-            cookie = ckArr[index];
-            await list(cookie);
-        }
+    let ckArr = await Variable_Check(ckStr, "HYFLS");
+    for (let index = 0; index < ckArr.length; index++) {
+        let num = index + 1;
+        console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
+        cookie = ckArr[index];
+        await list(cookie);
     }
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
-
-function getCookie() {
-    if (isRequest) {
-        const ck = $request.headers["access_token"]
-        if (ckStr) {
-            if (ckStr.indexOf(ck) == -1) { // 找不到返回 -1
-                ckStr = ckStr + "?" + ck;
-                $.setdata(ckStr, "HYFLS");
-                ckList = ckStr.split("?");
-                $.msg($.name + ` 获取第${ckList.length}个 ck 成功: ${ck}`);
-            }
-        } else {
-            $.setdata(ck, "HYFLS");
-            $.msg($.name + ` 获取第1个 ck 成功: ${ck}`);
-        }
-    }
-    $.done({})
-}
 
 function list(cookie) {
     return new Promise(resolve => {
