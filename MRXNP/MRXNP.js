@@ -5,7 +5,7 @@
 [task_local]
 0 15 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/MRXNP/MRXNP.js, tag=每日鲜奶铺, enabled=true
 [MITM]
-hostname = m.you.163.com
+hostname = timingmilk.timingmar.com
 [rewrite_local]
 # 每日鲜奶铺获取cookie
 ^https:\/\/timingmilk\.timingmar\.com\/applet\/mc\/eu\/address\/list url script-request-header https://raw.githubusercontent.com/xzxxn777/quanx/main/MRXNP/MRXNP.js
@@ -105,7 +105,7 @@ function exchange(cookie,address) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
-                    console.log(data1)
+                    console.log(data1.message)
                 }
             } catch (e) {
                 $.logErr(e, resp)
