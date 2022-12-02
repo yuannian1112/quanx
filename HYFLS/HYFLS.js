@@ -1,24 +1,24 @@
 /*
 打开我的-收货地址-获取ck(不行就退出微信重新进)
-活动入口：微信小程序-每日鲜奶铺
+活动入口：微信小程序-汇源福利社
 必须填一个地址
 [task_local]
-0 15 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/MRXNP/MRXNP.js, tag=每日鲜奶铺, enabled=true
+0 15 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/HYFLS/HYFLS.js, tag=汇源福利社, enabled=true
 [MITM]
-hostname = timingmilk.timingmar.com
+hostname = huiyuan.timingmar.com
 [rewrite_local]
-# 每日鲜奶铺获取cookie
-^https:\/\/timingmilk\.timingmar\.com\/applet\/mc\/eu\/address\/list url script-request-header https://raw.githubusercontent.com/xzxxn777/quanx/main/MRXNP/MRXNP.js
+# 汇源福利社获取cookie
+^https:\/\/huiyuan\.timingmar\.com\/hy-api\/mc\/eu\/address\/list url script-request-header https://raw.githubusercontent.com/xzxxn777/quanx/main/HYFLS/HYFLS.js
 
 */
-const $ = new Env('每日鲜奶铺');
+const $ = new Env('汇源福利社');
 const isRequest = typeof $request != "undefined"
-let ckStr = ($.isNode() ? process.env.MILK : $.getdata("MILK")) || "";
+let ckStr = ($.isNode() ? process.env.HYFLS : $.getdata("HYFLS")) || "";
 !(async () => {
     if (isRequest) {
         await getCookie();
     } else {
-        let ckArr = await Variable_Check(ckStr, "MILK");
+        let ckArr = await Variable_Check(ckStr, "HYFLS");
         for (let index = 0; index < ckArr.length; index++) {
             let num = index + 1;
             console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
@@ -34,12 +34,12 @@ function getCookie() {
         if (ckStr) {
             if (ckStr.indexOf(ck) == -1) { // 找不到返回 -1
                 ckStr = ckStr + "?" + ck;
-                $.setdata(ckStr, "MILK");
+                $.setdata(ckStr, "HYFLS");
                 ckList = ckStr.split("?");
                 $.msg($.name + ` 获取第${ckList.length}个 ck 成功: ${ck}`);
             }
         } else {
-            $.setdata(ck, "MILK");
+            $.setdata(ck, "HYFLS");
             $.msg($.name + ` 获取第1个 ck 成功: ${ck}`);
         }
     }
@@ -49,14 +49,14 @@ function getCookie() {
 function list(cookie) {
     return new Promise(resolve => {
         const options = {
-            url: `https://timingmilk.timingmar.com/applet/mc/eu/address/list`,
+            url: `https://huiyuan.timingmar.com/hy-api/mc/eu/address/list`,
             headers: {
-                "Host": "timingmilk.timingmar.com",
+                "Host": "huiyuan.timingmar.com",
                 "Accept": "application/json, text/plain, */*",
                 "Accept-Encoding": "gzip, deflate",
                 "User-Agent": 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36 MicroMessenger/7.0.4.501 NetType/WIFI MiniProgramEnv/Windows WindowsWechat/WMPF',
                 "Accept-Language": "en-us,en",
-                "Referer": "https://servicewechat.com/wx22e71861f072baf5/2/page-frame.html",
+                "Referer": "https://servicewechat.com/wx337e7266f9603c91/92/page-frame.html",
                 "Content-Type": "application/json",
                 "access_token": cookie,
             },
@@ -69,8 +69,42 @@ function list(cookie) {
                 } else {
                     let data1 = JSON.parse(data)
                     let address = data1.data.list[0].id;
+                    await getTodayLuckyGoods(cookie,address);
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+function getTodayLuckyGoods(cookie,address) {
+    return new Promise(resolve => {
+        const options = {
+            url: `https://huiyuan.timingmar.com/hy-api/mc/lucky/goods/user/getTodayLuckyGoods`,
+            headers: {
+                "Host": "huiyuan.timingmar.com",
+                "Accept": "application/json, text/plain, */*",
+                "Accept-Encoding": "gzip, deflate",
+                "User-Agent": 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36 MicroMessenger/7.0.4.501 NetType/WIFI MiniProgramEnv/Windows WindowsWechat/WMPF',
+                "Accept-Language": "en-us,en",
+                "Referer": "https://servicewechat.com/wx337e7266f9603c91/92/page-frame.html",
+                "Content-Type": "application/json",
+                "access_token": cookie,
+            },
+        }
+        $.get(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    let data1 = JSON.parse(data)
+                    let id = data1.data.id;
                     for (let i = 0; i < 3; i++) {
-                        await exchange(cookie, address);
+                        await exchange(cookie, address, id);
                     }
                 }
             } catch (e) {
@@ -82,21 +116,21 @@ function list(cookie) {
     })
 }
 
-function exchange(cookie,address) {
+function exchange(cookie,address,id) {
     return new Promise(resolve => {
         const options = {
-            url: `https://timingmilk.timingmar.com/applet/mc/lucky/goods/user/submit/order`,
+            url: `https://huiyuan.timingmar.com/hy-api/mc/lucky/goods/user/submit/order`,
             headers: {
-                "Host": "timingmilk.timingmar.com",
+                "Host": "huiyuan.timingmar.com",
                 "Accept": "application/json, text/plain, */*",
                 "Accept-Encoding": "gzip, deflate",
                 "User-Agent": 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36 MicroMessenger/7.0.4.501 NetType/WIFI MiniProgramEnv/Windows WindowsWechat/WMPF',
                 "Accept-Language": "en-us,en",
-                "Referer": "https://servicewechat.com/wx22e71861f072baf5/2/page-frame.html",
+                "Referer": "https://servicewechat.com/wx337e7266f9603c91/92/page-frame.html",
                 "Content-Type": "application/json",
                 "access_token": cookie,
             },
-            body:JSON.stringify({"luckyGoodsId":"1","quantity":"1","euCouponId":null,"totalPayFee":"0.99","loader":true,"remarks":"","addressId":`${address}`,"statusNow":2})
+            body:JSON.stringify({"luckyGoodsId":`${id}`,"quantity":"1","euCouponId":null,"totalPayFee":"0.99","loader":true,"remarks":"","addressId":`${address}`,"statusNow":2})
         }
         $.post(options, async (err, resp, data) => {
             try {
