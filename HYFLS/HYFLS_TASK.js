@@ -20,10 +20,14 @@ let ckStr = ($.isNode() ? process.env.HYFLS : $.getdata("HYFLS")) || "";
         let ckArr = await Variable_Check(ckStr, "HYFLS");
         for (let index = 0; index < ckArr.length; index++) {
             let num = index + 1;
+            $.isLogin = true;
             console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
             cookie = ckArr[index];
             console.log("获取助力码")
-            await getHelpId(cookie);
+            await getHelpId(cookie,num);
+            if (!$.isLogin) {
+                continue
+            }
             await $.wait(2000)
             await getNum(cookie)
         }
@@ -63,7 +67,7 @@ function getCookie() {
     $.done({})
 }
 
-function getHelpId(cookie) {
+function getHelpId(cookie,num) {
     return new Promise(resolve => {
         const options = {
             url: `https://huiyuan.timingmar.com/hy-api/lottery/activity/get-link-Code?id=6&noLoad=true`,
@@ -85,6 +89,11 @@ function getHelpId(cookie) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
+                    if(data1.code==1004) {
+                        $.isLogin = false;
+                        $.msg($.name + `第${num}个账号：ck已过期，请重新获取`);
+                        return
+                    }
                     let code = data1.data;
                     codeStr = $.getdata("HYFLSCODE") || "";
                     if (codeStr) {

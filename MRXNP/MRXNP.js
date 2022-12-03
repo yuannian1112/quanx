@@ -10,11 +10,11 @@ let ckStr = ($.isNode() ? process.env.MILK : $.getdata("MILK")) || "";
         let num = index + 1;
         console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
         cookie = ckArr[index];
-        await list(cookie);
+        await list(cookie,num);
     }
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
 
-function list(cookie) {
+function list(cookie,num) {
     return new Promise(resolve => {
         const options = {
             url: `https://timingmilk.timingmar.com/applet/mc/eu/address/list`,
@@ -36,6 +36,10 @@ function list(cookie) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
+                    if(data1.code==1004) {
+                        $.msg($.name + `第${num}个账号：ck已过期，请重新获取`);
+                        return
+                    }
                     let address = data1.data.list[0].id;
                     await getTodayLuckyGoods(cookie,address);
                 }
@@ -72,10 +76,14 @@ function getTodayLuckyGoods(cookie,address) {
                 else {
                     let data1 = JSON.parse(data)
                     let id = data1.data.id;
-                    let time = data1.data.openTime;
-                    $.msg($.name,"下场秒杀时："+new Date(time).toLocaleString(),"请手动更改定时！");
-                    for (let i = 0; i < 3; i++) {
-                        await exchange(cookie, address, id);
+                    if(id==null){
+                        $.msg($.name,"当前没有秒杀商品!");
+                    } else {
+                        let time = data1.data.openTime;
+                        $.msg($.name,"下场秒杀时："+new Date(time).toLocaleString(),"请手动更改定时！");
+                        for (let i = 0; i < 3; i++) {
+                            await exchange(cookie, address, id);
+                        }
                     }
                 }
             } catch (e) {
