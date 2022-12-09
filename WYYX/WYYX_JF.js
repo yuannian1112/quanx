@@ -59,7 +59,10 @@ function list(cookie,num) {
                         return
                     }
                     let tasks = data1.data.dailyTasks;
-                    //console.log(tasks)
+                    await sign(cookie, "签到");
+                    await $.wait(2000)
+                    await reward(cookie, 201001);
+                    await $.wait(2000)
                     for (let i = 0; i < tasks.length; i++) {
                         let taskId = tasks[i].taskId;
                         let title = tasks[i].title;
