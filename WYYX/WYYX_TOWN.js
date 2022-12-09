@@ -152,38 +152,45 @@ function queryTown(cookie,taskId,title) {
                         let buildId = downList[i].buildId;
                         console.log("建筑：" + downName + " 当前等级：" + downLevel)
                         let upgradeRequire = downList[i].upgradeRequire;
-                        let price = upgradeRequire.price;
-                        if (upgradeRequire.userMaterialDTOList != null) {
-                            let materialName = upgradeRequire.userMaterialDTOList[0].materialName;
-                            let count = upgradeRequire.userMaterialDTOList[0].upgradeCount;
-                            console.log("升级需要：金币：" + price + " " + materialName + "：" + count + "个")
-                            await $.wait(2000)
-                            if (buildId==1 && downList.length==7 && $.totalExtend>0){
-                                console.log("开始升级")
-                                await upgrade(cookie,buildId);
-                            }
-                            if (buildId!=1 && $.totalExtend>0){
-                                console.log("开始升级")
+                        if (upgradeRequire != null) {
+                            let price = upgradeRequire.price;
+                            if (upgradeRequire.userMaterialDTOList != null) {
+                                let materialName = upgradeRequire.userMaterialDTOList[0].materialName;
+                                let count = upgradeRequire.userMaterialDTOList[0].upgradeCount;
+                                console.log("升级需要：金币：" + price + " " + materialName + "：" + count + "个")
                                 await $.wait(2000)
-                                await upgrade(cookie,buildId);
-                            }
-                        } else {
-                            console.log("升级需要：" + "金币：" + price)
-                            await $.wait(2000)
-                            if (buildId!=1&&downLevel<10){
-                                console.log("开始升级")
-                                for (let j = 0; j < 10-downLevel; j++) {
+                                if (buildId==1 && downList.length==7 && $.totalExtend>0){
+                                    console.log("开始升级")
+                                    await upgrade(cookie,buildId);
+                                }
+                                if (buildId!=1 && $.totalExtend>0){
+                                    console.log("开始升级")
                                     await $.wait(2000)
                                     await upgrade(cookie,buildId);
                                 }
+                            } else {
+                                console.log("升级需要：" + "金币：" + price)
+                                await $.wait(2000)
+                                if (buildId!=1&&downLevel<10){
+                                    console.log("开始升级")
+                                    for (let j = 0; j < 10-downLevel; j++) {
+                                        await $.wait(2000)
+                                        await upgrade(cookie,buildId);
+                                    }
+                                }
+                                if (buildId!=1&&downList.length==7){
+                                    console.log("开始升级")
+                                    await upgrade(cookie,buildId);
+                                }
                             }
-                            if (buildId!=1&&downList.length==7){
-                                console.log("开始升级")
-                                await upgrade(cookie,buildId);
+                            if(buildId==1){
+                                await furnitureList(cookie,downList.length)
                             }
-                        }
-                        if(buildId==1){
-                            await furnitureList(cookie,downList.length)
+                        } else {
+                            console.log("建筑已满级")
+                            if(buildId==1){
+                                await furnitureList(cookie,downList.length)
+                            }
                         }
                     }
                     console.log("\n开始收集金币")
