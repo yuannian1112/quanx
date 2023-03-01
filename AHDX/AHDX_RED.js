@@ -14,6 +14,7 @@ let body1 = '';
 !(async () => {
     let ckArr = await Variable_Check(ckStr, "AHDX");
     for (let index = 0; index < ckArr.length; index++) {
+        isReceiveRed = false;
         let num = index + 1;
         console.log(`\n-------- 开始【第 ${num} 个账号】--------`);
         cookie = ckArr[index].split("&");
