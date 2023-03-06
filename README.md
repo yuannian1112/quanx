@@ -14,4 +14,5 @@
 |      小米运动      |          [XmSport.js](https://github.com/xzxxn777/quanx/blob/main/XmSport/XmSport.js)           | ✅(2022/11/23) |      ✅️      |
 
 ------
+### [一键订阅boxjs](http://boxjs.com/#/sub/add/https://raw.githubusercontent.com/xzxxn777/quanx/main/xzxxn.json)
 ### [点击直达频道](https://t.me/xzxxn777)
