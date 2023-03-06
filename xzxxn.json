@@ -9,17 +9,25 @@
       "id": "xmSports",
       "name": "小米运动",
       "keys": [
-        "xmSportsToken",
+        "phone",
+        "pwd",
         "xmMinStep",
         "xmMaxStep"
       ],
       "settings": [
         {
-          "id": "xmSportsToken",
-          "name": "小米运动Token",
+          "id": "phone",
+          "name": "小米运动账号",
           "val": "",
           "type": "text",
-          "desc": "小米运动登录时获取的token"
+          "desc": "小米运动账号"
+        },
+        {
+          "id": "pwd",
+          "name": "小米运动密码",
+          "val": "",
+          "type": "text",
+          "desc": "小米运动密码"
         },
         {
           "id": "xmMinStep",
