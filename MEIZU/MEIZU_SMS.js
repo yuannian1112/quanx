@@ -20,7 +20,7 @@ function accessTokenSms(phone, vcode) {
                 "Connection": "keep-alive",
                 "Charset": "UTF-8",
                 "pkg": "com.meizu.flyme.flymebbs",
-                "nonce": nonce,
+                "nonce": nonce.toString(),
                 "accept": "*/*",
                 "appid": "WDJDsFaicu2otW4uzIAi",
                 "brand": "meizu",
