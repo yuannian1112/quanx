@@ -3,8 +3,7 @@
 20 0,6,12,18 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/MEIZU/MEIZU.js, tag=魅族社区, img-url=https://raw.githubusercontent.com/xzxxn777/quanx/main/picture/meizu.png, enabled=true
 */
 const $ = new Env('魅族社区');
-//let token = ($.isNode() ? process.env.MZ_TOKEN : $.getdata("MZ_TOKEN")) || "";
-let token = $.getdata("MZ_TOKEN");
+let token = ($.isNode() ? process.env.MZ_TOKEN : $.getdata("MZ_TOKEN")) || "";
 let delay = 10000;
 !(async () => {
     if (token === "") {
