@@ -78,8 +78,7 @@ function getToken(rememberme) {
                     console.log(`${JSON.stringify(err)}`)
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
-                    let data1 = JSON.parse(data)
-                    let arr = ($.isNode() ? process.env.MEIZU : $.getdata("MEIZU")) || [];
+                    let data1 = JSON.parse(data)meizulet arr = ($.isNode() ? process.env.MEIZU : $.getjson("MEIZU")) || [];
                     let isNew = true;
                     for (let i = 0; i < arr.length; i++) {
                         if(arr[i].user_id == data1.user_id) {
@@ -92,7 +91,7 @@ function getToken(rememberme) {
                         arr.push({"user_id": data1.user_id,"token": data1.access_token});
                         console.log("用户："+data1.user_id + " 添加成功")
                     }
-                    $.setdata(arr, "MEIZU");
+                    $.setjson(arr, "MEIZU");
                 }
             } catch (e) {
                 $.logErr(e, resp)
