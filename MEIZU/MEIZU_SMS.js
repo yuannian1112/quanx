@@ -78,7 +78,8 @@ function getToken(rememberme) {
                     console.log(`${JSON.stringify(err)}`)
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
-                    let data1 = JSON.parse(data)meizulet arr = ($.isNode() ? process.env.MEIZU : $.getjson("MEIZU")) || [];
+                    let data1 = JSON.parse(data)
+                    let arr = ($.isNode() ? process.env.MEIZU : $.getjson("MEIZU")) || [];
                     let isNew = true;
                     for (let i = 0; i < arr.length; i++) {
                         if(arr[i].user_id == data1.user_id) {
