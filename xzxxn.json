@@ -18,11 +18,11 @@
       "scripts": [
         {
           "name": "发送验证码（填手机号, 保存, 执行）",
-          "script": "https://github.com/xzxxn777/quanx/blob/main/MEIZU/MEIZU_SendSms.js"
+          "script": "https://raw.githubusercontent.com/xzxxn777/quanx/main/MEIZU/MEIZU_SendSms.js"
         },
         {
           "name": "用验证码登录（填手机号, 验证码, 保存, 执行 ⚠️ 执行后 记得刷新）",
-          "script": "https://github.com/xzxxn777/quanx/blob/main/MEIZU/MEIZU_SMS.js"
+          "script": "https://raw.githubusercontent.com/xzxxn777/quanx/main/MEIZU/MEIZU_SMS.js"
         }
       ],
       "settings": [
