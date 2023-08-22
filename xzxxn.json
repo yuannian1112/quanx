@@ -6,6 +6,47 @@
   "repo": "https://github.com/xzxxn777/quanx",
   "apps": [
     {
+      "id": "MEIZU",
+      "name": "魅族社区",
+      "keys": [
+        "MZ_PHONE",
+        "MZ_CODE",
+        "MZ_TOKEN"
+      ],
+      "author": "@xzxxn",
+      "repo": "https://github.com/xzxxn777/quanx",
+      "scripts": [
+        {
+          "name": "发送验证码（填手机号, 保存, 执行）",
+          "script": "https://github.com/xzxxn777/quanx/blob/main/MEIZU/MEIZU_SendSms.js"
+        },
+        {
+          "name": "用验证码登录（填手机号, 验证码, 保存, 执行 ⚠️ 执行后 记得刷新）",
+          "script": "https://github.com/xzxxn777/quanx/blob/main/MEIZU/MEIZU_SMS.js"
+        }
+      ],
+      "settings": [
+        {
+          "id": "MZ_PHONE",
+          "name": "魅族账号-手机号",
+          "val": "",
+          "type": "text",
+          "desc": "魅族账号-手机号"
+        },
+        {
+          "id": "MZ_CODE",
+          "name": "验证码",
+          "val": "",
+          "type": "text",
+          "desc": "验证码"
+        }
+      ],
+      "icons": [
+        "https://raw.githubusercontent.com/xzxxn777/quanx/main/picture/meizu.png",
+        "https://raw.githubusercontent.com/xzxxn777/quanx/main/picture/meizu.png"
+      ]
+    },
+    {
       "id": "xmSports",
       "name": "小米运动",
       "keys": [
