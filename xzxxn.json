@@ -23,6 +23,10 @@
         {
           "name": "用验证码登录（填手机号, 验证码, 保存, 执行 ⚠️ 执行后 记得刷新）",
           "script": "https://raw.githubusercontent.com/xzxxn777/quanx/main/MEIZU/MEIZU_SMS.js"
+        },
+        {
+          "name": "手动执行",
+          "script": "https://raw.githubusercontent.com/xzxxn777/quanx/main/MEIZU/MEIZU.js"
         }
       ],
       "settings": [
