@@ -5,6 +5,7 @@
 const $ = new Env('魅族社区');
 let arr = ($.isNode() ? process.env.MEIZU : $.getdata("MEIZU")) || [];
 let delay = 10000;
+let app_version= "6.2.8"
 !(async () => {
     if (arr.length == 0) {
         console.log("请先登录")
@@ -55,22 +56,9 @@ let delay = 10000;
                 await $.wait(Math.floor(Math.random() * delay + 2000));
             }
         }
-        let count = 0;
-        let  lastList =[];
-        let dataM_COIN = await commonPost("/myplus-muc/u/user/point/flow/M_COIN?currentPage=0");
-
-        lastList=lastList.concat(dataM_COIN.rows)
-        await $.wait(Math.floor(Math.random() * delay + 2000));
-        dataM_COIN = await commonPost("/myplus-muc/u/user/point/flow/M_COIN?currentPage=1");
-        lastList=lastList.concat(dataM_COIN.rows)
-        dataM_COIN = await commonPost("/myplus-muc/u/user/point/flow/M_COIN?currentPage=2");
-        lastList=lastList.concat(dataM_COIN.rows)
-        for (const row of lastList) {
-            if (isToday(row.date)){
-                count+= row.point
-            }
-        }
-        $.msg($.name + "用户："+arr[i].user_id,`今日获得 煤球: ${count}`);
+        console.log(`开始商城任务`)
+        await mzStore(arr[i].user_id, arr[i].token)
+        await countBenefits(arr[i].user_id)
     }
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
 
@@ -101,6 +89,7 @@ function loginByToken(token,isLogin) {
                 } else {
                     let data1 = JSON.parse(data)
                     if (data1.code == 200) {
+                        sid = data1.data[0].value;
                         cookie = "STORE-UUID=" + data1.data[0].value + "; MEIZUSTORESESSIONID=" + data1.data[0].value + ";";
                         console.log(cookie)
                     } else {
@@ -116,6 +105,101 @@ function loginByToken(token,isLogin) {
             }
         })
     })
+}
+
+async function mzStore(user_id,token){
+    // 签到
+    await mzStoreSign(user_id)
+    // 积分抽奖
+    await storeLotteryDraw(token)
+}
+
+async function mzStoreSign(uid){
+    return new Promise(resolve => {
+        const data = {
+            url: `https://app.store.res.meizu.com/mzstore/sign/add`,
+            headers: {
+                "Host": "app.store.res.meizu.com",
+                "User-Agent": "okhttp/3.12.1",
+                "mz_channel": "meizu",
+                "mz_version": "5000",
+                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+            },
+            body: `uid=${uid}&sid=${sid}&`,
+            timeout: 10000
+        };
+        $.post(data, (err, resp, data) => {
+            try {
+                if (err) {
+
+                    console.log(JSON.stringify(err));
+                    $.logErr(err);
+                } else {
+                    console.log(data)
+                    let dataObj = JSON.parse(data);
+                    resolve(dataObj);
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+// 积分抽奖
+async function storeLotteryDraw(token){
+    return new Promise(resolve => {
+        const data = {
+            url: `https://pyramid.meizu.com/m/score?activityId=2009&appId=1`,
+            headers: {
+                "Host": "pyramid.meizu.com",
+                "Referer": "https://hd.mall.meizu.com/activity/lottry54.html",
+                "User-Agent": `Mozilla/5.0 (Linux; Android 10; Build/QKQ1.191222.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/83.0.4103.106 Mobile Safari/537.36 MzbbsApp/${app_version}MzmApp/${app_version} FlymePreApp/${app_version} AppVersionCode/50000042 MzChannel/meizu DeviceBrand/meizu DeviceModel`,
+                "Connection": "keep-alive",
+                "X-Requested-With":" com.meizu.flyme.flymebbs",
+                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "cookie":`token=${token}; ${cookie}`
+            },
+            timeout: 10000
+        };
+        $.get(data, (err, resp, data) => {
+            try {
+                if (err) {
+
+                    console.log(JSON.stringify(err));
+                    $.logErr(err);
+                } else {
+                    console.log(data)
+                    let dataObj = JSON.parse(data);
+                    resolve(dataObj);
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+async function countBenefits(user_id){
+    let count = 0;
+    let  lastList =[];
+    let dataM_COIN = await commonPost("/myplus-muc/u/user/point/flow/M_COIN?currentPage=0");
+    lastList=lastList.concat(dataM_COIN.rows)
+    await $.wait(Math.floor(Math.random() * delay + 2000));
+    dataM_COIN = await commonPost("/myplus-muc/u/user/point/flow/M_COIN?currentPage=1");
+    lastList=lastList.concat(dataM_COIN.rows)
+    dataM_COIN = await commonPost("/myplus-muc/u/user/point/flow/M_COIN?currentPage=2");
+    lastList=lastList.concat(dataM_COIN.rows)
+    for (const row of lastList) {
+        if (isToday(row.date)){
+            count+= row.point
+        }
+    }
+    $.msg($.name + "用户："+user_id,`今日获得 煤球: ${count}`);
+    await $.wait(Math.floor(Math.random() * delay + 2000));
 }
 
 // 判断日期是不是今天、昨天、明天
