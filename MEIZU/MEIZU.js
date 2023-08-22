@@ -5,12 +5,16 @@
 const $ = new Env('魅族社区');
 let token = ($.isNode() ? process.env.MZ_TOKEN : $.getdata("MZ_TOKEN")) || "";
 let delay = 10000;
+let isLogin = 1;
 !(async () => {
     if (token === "") {
         console.log("请先登录")
         return
     }
     await loginByToken(token);
+    if (isLogin == 0) {
+        return
+    }
     await crossCorrelation()
     // 任务列表
     let taskDate = await commonPost("/myplus-muc/u/user/point/task/M_COIN");
@@ -92,9 +96,14 @@ function loginByToken(token) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
-                    //console.log(data1)
-                    cookie = "STORE-UUID=" + data1.data[0].value + "; MEIZUSTORESESSIONID=" + data1.data[0].value + ";";
-                    console.log(cookie)
+                    if (data1.code == 200) {
+                        cookie = "STORE-UUID=" + data1.data[0].value + "; MEIZUSTORESESSIONID=" + data1.data[0].value + ";";
+                        console.log(cookie)
+                    } else {
+                        console.log(data1.msg)
+                        $.msg($.name + data1.msg);
+                        isLogin = 0;
+                    }
                 }
             } catch (e) {
                 $.logErr(e, resp)
