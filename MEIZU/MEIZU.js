@@ -3,75 +3,79 @@
 20 0,6,12,18 * * * https://raw.githubusercontent.com/xzxxn777/quanx/main/MEIZU/MEIZU.js, tag=魅族社区, img-url=https://raw.githubusercontent.com/xzxxn777/quanx/main/picture/meizu.png, enabled=true
 */
 const $ = new Env('魅族社区');
-let token = ($.isNode() ? process.env.MZ_TOKEN : $.getdata("MZ_TOKEN")) || "";
+let arr = ($.isNode() ? process.env.MEIZU : $.getdata("MEIZU")) || [];
 let delay = 10000;
-let isLogin = 1;
 !(async () => {
-    if (token === "") {
+    if (arr.length == 0) {
         console.log("请先登录")
         return
     }
-    await loginByToken(token);
-    if (isLogin == 0) {
-        return
-    }
-    await crossCorrelation()
-    // 任务列表
-    let taskDate = await commonPost("/myplus-muc/u/user/point/task/M_COIN");
-    // let newVar = await signin();
+    for (let i = 0; i < arr.length; i++) {
+        console.log("\n")
+        console.log("用户："+arr[i].user_id + " 开始任务")
+        let isLogin = 1;
+        await loginByToken(arr[i].token,isLogin);
+        if (isLogin == 0) {
+            continue
+        }
+        await crossCorrelation()
+        // 任务列表
+        let taskDate = await commonPost("/myplus-muc/u/user/point/task/M_COIN");
+        // let newVar = await signin();
 
-    let taskList = taskDate.list;
-    for (const task of taskList) {
-        if (!task.complete) {
-            console.log(`开始任务 ${task.taskName}   ${task.remark}`)
-            switch (task.taskName) {
-                case "点赞":
-                    await likeTask()
-                    break;
-                case "关注用户":
-                    await followUser();
-                    break;
-                case "关注话题":
-                    await focusTopics();
-                    break;
-                case "加入圈子":
-                    // await forum();
-                    break;
-                case "发表评论":
-                    await comment();
-                    break;
-                case "收藏主题":
-                    await contentFav();
-                    break;
-                case "发布主题":
-                    break;
-                case "每日签到":
-                    await signin();
-                    break
+        let taskList = taskDate.list;
+        for (const task of taskList) {
+            if (!task.complete) {
+                console.log(`开始任务 ${task.taskName}   ${task.remark}`)
+                switch (task.taskName) {
+                    case "点赞":
+                        await likeTask()
+                        break;
+                    case "关注用户":
+                        await followUser();
+                        break;
+                    case "关注话题":
+                        await focusTopics();
+                        break;
+                    case "加入圈子":
+                        // await forum();
+                        break;
+                    case "发表评论":
+                        await comment();
+                        break;
+                    case "收藏主题":
+                        await contentFav();
+                        break;
+                    case "发布主题":
+                        break;
+                    case "每日签到":
+                        await signin();
+                        break
+                }
+                await $.wait(Math.floor(Math.random() * delay + 2000));
             }
-            await $.wait(Math.floor(Math.random() * delay + 2000));
         }
-    }
-    let count = 0;
-    let  lastList =[];
-    let dataM_COIN = await commonPost("/myplus-muc/u/user/point/flow/M_COIN?currentPage=0");
+        let count = 0;
+        let  lastList =[];
+        let dataM_COIN = await commonPost("/myplus-muc/u/user/point/flow/M_COIN?currentPage=0");
 
-    lastList=lastList.concat(dataM_COIN.rows)
-    await $.wait(Math.floor(Math.random() * delay + 2000));
-    dataM_COIN = await commonPost("/myplus-muc/u/user/point/flow/M_COIN?currentPage=1");
-    lastList=lastList.concat(dataM_COIN.rows)
-    dataM_COIN = await commonPost("/myplus-muc/u/user/point/flow/M_COIN?currentPage=2");
-    lastList=lastList.concat(dataM_COIN.rows)
-    for (const row of lastList) {
-        if (isToday(row.date)){
-            count+= row.point
+        lastList=lastList.concat(dataM_COIN.rows)
+        await $.wait(Math.floor(Math.random() * delay + 2000));
+        dataM_COIN = await commonPost("/myplus-muc/u/user/point/flow/M_COIN?currentPage=1");
+        lastList=lastList.concat(dataM_COIN.rows)
+        dataM_COIN = await commonPost("/myplus-muc/u/user/point/flow/M_COIN?currentPage=2");
+        lastList=lastList.concat(dataM_COIN.rows)
+        for (const row of lastList) {
+            if (isToday(row.date)){
+                count+= row.point
+            }
         }
+        $.msg($.name + "用户："+arr[i].user_id,`今日获得 煤球: ${count}`);
     }
-    console.log(`今日获得 煤球: ${count}`)
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
 
 
-function loginByToken(token) {
+function loginByToken(token,isLogin) {
     return new Promise(resolve => {
         const options = {
             url: `https://myplus-api.meizu.cn/myplus-login/g/app/login?token=${token}`,

@@ -79,8 +79,20 @@ function getToken(rememberme) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     let data1 = JSON.parse(data)
-                    console.log("用户："+data1.nickname)
-                    $.setdata(data1.access_token, "MZ_TOKEN");
+                    let arr = ($.isNode() ? process.env.MEIZU : $.getdata("MEIZU")) || [];
+                    let isNew = true;
+                    for (let i = 0; i < arr.length; i++) {
+                        if(arr[i].user_id == data1.user_id) {
+                            arr[i].token =data1.access_token;
+                            console.log("用户："+data1.user_id + " 更新成功")
+                            isNew = false;
+                        }
+                    }
+                    if (isNew) {
+                        arr.push({"user_id": data1.user_id,"token": data1.access_token});
+                        console.log("用户："+data1.user_id + " 添加成功")
+                    }
+                    $.setdata(arr, "MEIZU");
                 }
             } catch (e) {
                 $.logErr(e, resp)
