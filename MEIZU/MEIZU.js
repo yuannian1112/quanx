@@ -14,8 +14,7 @@ let app_version= "6.2.8"
     for (let i = 0; i < arr.length; i++) {
         console.log("\n")
         console.log("用户："+arr[i].user_id + " 开始任务")
-        let isLogin = 1;
-        await loginByToken(arr[i].token,isLogin);
+        await loginByToken(arr[i].token);
         if (isLogin == 0) {
             continue
         }
@@ -63,7 +62,7 @@ let app_version= "6.2.8"
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
 
 
-function loginByToken(token,isLogin) {
+function loginByToken(token) {
     return new Promise(resolve => {
         const options = {
             url: `https://myplus-api.meizu.cn/myplus-login/g/app/login?token=${token}`,
@@ -89,6 +88,7 @@ function loginByToken(token,isLogin) {
                 } else {
                     let data1 = JSON.parse(data)
                     if (data1.code == 200) {
+                        isLogin = 1;
                         sid = data1.data[0].value;
                         cookie = "STORE-UUID=" + data1.data[0].value + "; MEIZUSTORESESSIONID=" + data1.data[0].value + ";";
                         console.log(cookie)
@@ -198,7 +198,7 @@ async function countBenefits(user_id){
             count+= row.point
         }
     }
-    $.msg($.name + "用户："+user_id,`今日获得 煤球: ${count}`);
+    $.msg($.name + "用户："+user_id,`今日获得 煤球: ${count}`,`拥有煤球：${total}`);
     await $.wait(Math.floor(Math.random() * delay + 2000));
 }
 
@@ -404,6 +404,7 @@ async function commonPost(method, body = {}) {
                     if (dataObj.code !== 200) {
                         console.log("获取 数据失败 ")
                     }
+                    total = dataObj.data.mcoin;
                     resolve(dataObj.data);
                 }
             } catch (e) {
