@@ -110,8 +110,12 @@ function loginByToken(token) {
 async function mzStore(user_id,token){
     // 签到
     await mzStoreSign(user_id)
-    // 积分抽奖
-    await storeLotteryDraw(token)
+    //判断抽奖
+    let left = await getLeft()
+    if (left > 0) {
+        // 积分抽奖
+        await storeLotteryDraw(token)
+    }
 }
 
 async function mzStoreSign(uid){
@@ -147,6 +151,38 @@ async function mzStoreSign(uid){
         })
     })
 }
+
+async function getLeft(){
+    return new Promise(resolve => {
+        const data = {
+            url: `https://pyramid.meizu.com/draw/getLeft?appId=1&activityId=2009&callback=superagentCallback1692709402878301`,
+            headers: {
+                "Host": "pyramid.meizu.com",
+                "User-Agent": "okhttp/3.12.1",
+                "Cookie": cookie,
+            },
+            timeout: 10000
+        };
+        $.get(data, (err, resp, data) => {
+            try {
+                if (err) {
+
+                    console.log(JSON.stringify(err));
+                    $.logErr(err);
+                } else {
+                    console.log(data)
+                    let dataObj = JSON.parse(data.toString().match(/\(([^)]+)\)/)[1]);
+                    resolve(dataObj.data.left);
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
 // 积分抽奖
 async function storeLotteryDraw(token){
     return new Promise(resolve => {
