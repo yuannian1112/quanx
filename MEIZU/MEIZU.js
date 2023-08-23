@@ -18,11 +18,9 @@ let app_version= "6.2.8"
         if (isLogin == 0) {
             continue
         }
-        await crossCorrelation()
         // 任务列表
         let taskDate = await commonPost("/myplus-muc/u/user/point/task/M_COIN");
         // let newVar = await signin();
-
         let taskList = taskDate.list;
         for (const task of taskList) {
             if (!task.complete) {
@@ -38,7 +36,7 @@ let app_version= "6.2.8"
                         await focusTopics();
                         break;
                     case "加入圈子":
-                        // await forum();
+                         await forum();
                         break;
                     case "发表评论":
                         await comment();
@@ -47,6 +45,9 @@ let app_version= "6.2.8"
                         await contentFav();
                         break;
                     case "发布主题":
+                        break;
+                    case "获得 10 个关注":
+                        await crossCorrelation()
                         break;
                     case "每日签到":
                         await signin();
@@ -61,6 +62,12 @@ let app_version= "6.2.8"
     }
 })().catch((e) => {$.log(e)}).finally(() => {$.done({});});
 
+// 判断日期是不是今天、昨天、明天
+const isToday = (str) => {
+    let d = new Date(str).setHours(0, 0, 0, 0);
+    let today = new Date().setHours(0, 0, 0, 0);
+    return d - today === 0;
+};
 
 function loginByToken(token) {
     return new Promise(resolve => {
@@ -135,7 +142,6 @@ async function mzStoreSign(uid){
         $.post(data, (err, resp, data) => {
             try {
                 if (err) {
-
                     console.log(JSON.stringify(err));
                     $.logErr(err);
                 } else {
@@ -155,23 +161,26 @@ async function mzStoreSign(uid){
 async function getLeft(){
     return new Promise(resolve => {
         const data = {
-            url: `https://pyramid.meizu.com/draw/getLeft?appId=1&activityId=2009&callback=superagentCallback1692709402878301`,
+            url: `https://pyramid.meizu.com/draw/getLeft?appId=1&activityId=2009`,
             headers: {
                 "Host": "pyramid.meizu.com",
-                "User-Agent": "okhttp/3.12.1",
-                "Cookie": cookie,
+                "Referer": "https://hd.mall.meizu.com/activity/lottry54.html",
+                "User-Agent": `Mozilla/5.0 (Linux; Android 10; Build/QKQ1.191222.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/83.0.4103.106 Mobile Safari/537.36 MzbbsApp/${app_version}MzmApp/${app_version} FlymePreApp/${app_version} AppVersionCode/50000042 MzChannel/meizu DeviceBrand/meizu DeviceModel`,
+                "Connection": "keep-alive",
+                "X-Requested-With":" com.meizu.flyme.flymebbs",
+                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "cookie":cookie
             },
             timeout: 10000
         };
         $.get(data, (err, resp, data) => {
             try {
                 if (err) {
-
                     console.log(JSON.stringify(err));
                     $.logErr(err);
                 } else {
                     console.log(data)
-                    let dataObj = JSON.parse(data.toString().match(/\(([^)]+)\)/)[1]);
+                    let dataObj = JSON.parse(data);
                     resolve(dataObj.data.left);
                 }
             } catch (e) {
@@ -202,7 +211,6 @@ async function storeLotteryDraw(token){
         $.get(data, (err, resp, data) => {
             try {
                 if (err) {
-
                     console.log(JSON.stringify(err));
                     $.logErr(err);
                 } else {
@@ -237,13 +245,6 @@ async function countBenefits(user_id){
     $.msg($.name + "用户："+user_id,`今日获得 煤球: ${count}`,`拥有煤球：${total}`);
     await $.wait(Math.floor(Math.random() * delay + 2000));
 }
-
-// 判断日期是不是今天、昨天、明天
-const isToday = (str) => {
-    let d = new Date(str).setHours(0, 0, 0, 0);
-    let today = new Date().setHours(0, 0, 0, 0);
-    return d - today==0 ?true:false;
-};
 
 async function crossCorrelation() {
     let i = 0
@@ -300,11 +301,12 @@ async function forum() {
     for (const forum of forumPage.rows) {
         if (!forum.isFollowed) {
             await commonTaskPost(`/myplus-qing/u/forum/follow?id=${forum.id}`)
+            i++;
         } else {
             await commonTaskPost(`/myplus-qing/u/forum/unfollow?id=${forum.id}`)
         }
         await $.wait(Math.floor(Math.random() * delay + 2000));
-
+        if(i>=2) return
     }
 }
 
@@ -330,7 +332,7 @@ async function followUser(page = 0) {
 // curl  "" "https://myplus-api.meizu.cn"
 // https://myplus-api.meizu.cn"
 async function comment() {
-    let recommendationList = await square(3);
+    let recommendationList = await square();
     let i = 0;
     for (const rec of recommendationList.blocks) {
         if (rec.type.includes('content')) {
@@ -412,7 +414,7 @@ async function recommendation() {
 
 // 广场列表
 async function square(page = 0) {
-    return commonGet(`/myplus-qing/ug/content/square/channel/data?page=${page}&sourceId=moment&sourceType=aggregation&type=content`)
+    return commonGet(`/myplus-qing/ug/content/square/channel/data?sourceId=moment&sourceType=aggregation&type=content`)
 }
 
 // 推荐列表
@@ -432,7 +434,6 @@ async function commonPost(method, body = {}) {
         $.post(taskUrl(method, body), (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`\n  ${method}n: API查询请求失败 ‼️‼️`);
                     console.log(JSON.stringify(err));
                     $.logErr(err);
                 } else {
@@ -458,7 +459,6 @@ async function commonTaskPost(method, body = {}) {
         $.post(taskUrl(method, body), (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`\n  ${method}n: API查询请求失败 ‼️‼️`);
                     console.log(JSON.stringify(err));
                     $.logErr(err);
                 } else {
@@ -489,7 +489,7 @@ async function commonTaskPostBody(method, body = {}) {
                 "Accept-Encoding": "gzip",
                 "LOCAL-TIME": new Date().getTime(),
                 "User-Agent": "android_app_myplus",
-                "ANDROID-APP-VERSION_NAME": "6.2.7",
+                "ANDROID-APP-VERSION_NAME": app_version,
                 "ANDROID-APP-VERSION-CODE": "50000042",
                 "DARK-MODE": "0",
                 "Cookie": cookie
@@ -500,7 +500,6 @@ async function commonTaskPostBody(method, body = {}) {
         $.post(data, (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`\n  ${method}n: API查询请求失败 ‼️‼️`);
                     console.log(JSON.stringify(err));
                     $.logErr(err);
                 } else {
@@ -525,7 +524,6 @@ async function commonGet(method, body = {}) {
         $.get(data, (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`\n  ${method}n: API查询请求失败 ‼️‼️`);
                     console.log(JSON.stringify(err));
                     $.logErr(err);
                 } else {
@@ -555,7 +553,6 @@ async function commonTaskGet(method, body = {}) {
         $.get(data, (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`\n  ${method}n: API查询请求失败 ‼️‼️`);
                     console.log(JSON.stringify(err));
                     $.logErr(err);
                 } else {
@@ -573,7 +570,6 @@ async function commonTaskGet(method, body = {}) {
         })
     })
 }
-
 
 function safeGet(data) {
     try {
@@ -599,50 +595,13 @@ function taskUrl(url_s, body = {}) {
             "Accept-Encoding": "gzip",
             "LOCAL-TIME": new Date().getTime(),
             "User-Agent": "android_app_myplus",
-            "ANDROID-APP-VERSION_NAME": "6.2.7",
+            "ANDROID-APP-VERSION_NAME": app_version,
             "ANDROID-APP-VERSION-CODE": "50000042",
             "DARK-MODE": "0",
             "Cookie": cookie
         },
         timeout: 10000
     }
-}
-
-
-
-//获取当前日期函数
-function getNowFormatDate() {
-    let date = new Date(),
-        year = date.getFullYear(), //获取完整的年份(4位)
-        month = date.getMonth() + 1, //获取当前月份(0-11,0代表1月)
-        strDate = date.getDate() // 获取当前日(1-31)
-    if (month >= 1 && month <= 9) month = '0' + month // 如果月份是个位数，在前面补0
-    if (strDate >= 0 && strDate <= 9) strDate = '0' + strDate // 如果日是个位数，在前面补0
-
-    let currentdate = `${year}${month}${strDate}`
-    return currentdate
-}
-
-/**
- * 变量检查
- */
-async function Variable_Check(ck, Variables) {
-    return new Promise((resolve) => {
-        let ckArr = [];
-        if (ck) {
-            if (ck.indexOf("?") !== -1) {
-                ck.split("?").forEach((item) => {
-                    ckArr.push(item);
-                });
-            } else {
-                ckArr.push(ck);
-            }
-            resolve(ckArr);
-        } else {
-            console.log(` ${$.name}:未填写变量 ${Variables} ,请仔细阅读脚本说明!`);
-            $.done()
-        }
-    });
 }
 
 // prettier-ignore
